@@ -52,7 +52,6 @@ void Elastic_ANI::set_specifications()
 
     cudaMalloc((void**)&(d_S), volsize*sizeof(float));
     cudaMemcpy(d_S, S, volsize*sizeof(float), cudaMemcpyHostToDevice);
-    delete[] S;
 
     auto * B = new float[volsize]();
     auto * uB = new uintc[volsize]();
@@ -296,6 +295,9 @@ void Elastic_ANI::compute_eikonal()
 
     eikonal_solver();
 
+    cudaMemcpy(S, d_S, volsize*sizeof(float), cudaMemcpyDeviceToHost);    
+    export_binary_float("slowness_before.bin", S, volsize);    
+
     get_quasi_slowness<<<nBlocks,nThreads>>>(d_T,d_S,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,d_C11, 
                                              d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,d_C23,d_C24,d_C25, 
                                              d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55, 
@@ -311,6 +313,11 @@ void Elastic_ANI::compute_eikonal()
     time_init<<<grid,block>>>(d_T,d_S,sx,sy,sz,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nzz,nb);
 
     eikonal_solver();
+
+    cudaMemcpy(S, d_S, volsize*sizeof(float), cudaMemcpyDeviceToHost);    
+    export_binary_float("slowness_after.bin", S, volsize);    
+
+    cudaMemcpy(d_S, S, volsize * sizeof(float), cudaMemcpyHostToDevice);
 }
 
 void Elastic_ANI::compute_velocity()

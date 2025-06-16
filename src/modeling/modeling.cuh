@@ -71,6 +71,8 @@ protected:
     std::string modeling_type;
     std::string modeling_name;
 
+    float * S = nullptr;
+
     float * d1D = nullptr;
     float * d2D = nullptr;
     float * d3D = nullptr;
@@ -105,7 +107,7 @@ protected:
     virtual void compute_pressure() = 0;
 
     void eikonal_solver();
-    
+
     void expand_boundary(float * input, float * output);
     void reduce_boundary(float * input, float * output);
     
