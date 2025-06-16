@@ -1,6 +1,4 @@
-*.i
-*.ii
-*.gpu
-*.ptx
-*.cubin
-*.fatbin
+*.exe
+*.bin
+*.txt
+*.png
