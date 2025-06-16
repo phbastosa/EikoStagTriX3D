@@ -1,0 +1,48 @@
+#---------------------------------------------------------------------------------------------------
+# Model paramenters --------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+x_samples = 101                            # <int>  
+y_samples = 101                            # <int>  
+z_samples = 101                            # <int>  
+
+x_spacing = 10.0                           # [m] <float> 
+y_spacing = 10.0                           # [m] <float> 
+z_spacing = 10.0                           # [m] <float> 
+
+vp_model_file = ../inputs/models/anisoTest_vp.bin
+ro_model_file = ../inputs/models/anisoTest_ro.bin
+
+Cijkl_folder = ../inputs/models/anisoTest_
+
+#---------------------------------------------------------------------------------------------------
+# Geometry parameters ------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+SPS = ../inputs/geometry/anisoTest_SPS.txt              
+RPS = ../inputs/geometry/anisoTest_RPS.txt     
+XPS = ../inputs/geometry/anisoTest_XPS.txt     
+
+#---------------------------------------------------------------------------------------------------
+# Modeling parameters ------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+# [0] - Elastic ISO
+# [1] - Elastic ANI
+# --------------------------------------------------------------------------------------------------
+
+modeling_type = 0
+
+time_samples = 1501
+time_spacing = 1e-3
+max_frequency = 50.0
+
+boundary_samples = 50
+boundary_damping = 0.0055
+
+snapshot = false
+beg_snap = 1000
+end_snap = 1000
+num_snap = 1
+
+snapshot_folder = ../outputs/snapshots/
+seismogram_folder = ../outputs/seismograms/
