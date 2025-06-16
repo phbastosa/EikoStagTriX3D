@@ -36,13 +36,13 @@ model = pyf.read_binary_volume(nz, nx, ny, model_file)
 dh = np.array([dx, dy, dz])
 slices = np.array([0.5*nz, 0.5*ny, 0.5*nx], dtype = int)
 
-pyf.plot_model_3D(model, dh, slices, shots = sps_path, scale = 2.0, 
-                  nodes = rps_path, adjx = 0.75, dbar = 1.4,
+pyf.plot_model_3D(model, dh, slices, shots = sps_path, scale = 0.6, 
+                  nodes = rps_path, adjx = 0.6, dbar = 1.3,
                   cblab = "P wave velocity [km/s]", 
-                  vmin = 1600, vmax = 2000)
+                  vmin = 1500, vmax = 2000)
 plt.show()
 
-tId = 500
+tId = 800
 
 snap_iso_file = snapshot_folder +f"elastic_ani_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
 eiko_iso_file = snapshot_folder +f"elastic_ani_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
@@ -57,9 +57,9 @@ perc = 2000
 
 snapshot_iso *= perc / np.max(np.abs(snapshot_iso))
 
-pyf.plot_model_3D(snapshot_iso, dh, slices, shots = sps_path, scale = 2.0, 
+pyf.plot_model_3D(snapshot_iso, dh, slices, shots = sps_path, scale = 0.6, 
                   nodes = rps_path, eikonal = eikonal_iso, eikonal_levels = [tId*dt], 
-                  eikonal_colors = ["red"] , adjx = 0.75, dbar = 1.4, cmap = "Greys",
+                  eikonal_colors = ["red"] , adjx = 0.6, dbar = 1.2, cmap = "Greys",
                   cblab = "Normalized amplitude - Isotropic", vmin = -0.5*perc, vmax = 0.5*perc)
 plt.show()
 
@@ -68,9 +68,9 @@ snapshot_ani = pyf.read_binary_volume(nz, nx, ny, snap_ani_file)
 
 snapshot_ani *= perc / np.max(np.abs(snapshot_ani))
 
-pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 2.0, 
+pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 0.6, 
                   nodes = rps_path, eikonal = eikonal_ani, eikonal_levels = [tId*dt], 
-                  eikonal_colors = ["red"] , adjx = 0.75, dbar = 1.4, cmap = "Greys",
+                  eikonal_colors = ["red"] , adjx = 0.6, dbar = 1.2, cmap = "Greys",
                   cblab = "Normalized amplitude - Anisotropic", vmin = -0.5*perc, vmax = 0.5*perc)
 plt.show()
 
@@ -91,27 +91,29 @@ ax[1].imshow(seismogram_ani, aspect = "auto", cmap = "Greys", vmin = -scale, vma
 fig.tight_layout()
 plt.show()
 
-times = np.arange(nt)*dt
+tlag = 500
 
-trace_iso = seismogram_iso[:,int(0.5*nr)]
-trace_ani = seismogram_ani[:,int(0.5*nr)]
+times = np.arange(nt-2*tlag)*dt
 
-freqs = np.fft.fftfreq(nt, dt)
+trace_iso = seismogram_iso[tlag:-tlag,int(0.5*nr)]
+trace_ani = seismogram_ani[tlag:-tlag,int(0.5*nr)]
 
-mask = freqs >= 0
+freqs = np.fft.fftfreq(nt-2*tlag, dt)
+
+mask = freqs > 0
 
 fft_iso = np.fft.fft(trace_iso)
 fft_ani = np.fft.fft(trace_ani)
 
 fig, ax = plt.subplots(ncols = 2, figsize = (6,8))
 
-ax[0].plot(trace_iso, times)
-ax[0].plot(trace_ani, times)
-ax[0].set_ylim([0, (nt-1)*dt])
+ax[0].plot(trace_iso, times+tlag*dt)
+ax[0].plot(trace_ani, times+tlag*dt)
+ax[0].set_ylim([0.5, (nt-tlag-1)*dt])
 ax[0].invert_yaxis()
 
-ax[1].plot(np.abs(fft_iso[mask]), freqs[mask])
-ax[1].plot(np.abs(fft_ani[mask]), freqs[mask])
+ax[1].plot(np.abs(fft_iso[mask]), freqs[mask], "--o")
+ax[1].plot(np.abs(fft_ani[mask]), freqs[mask], "--o")
 ax[1].set_ylim([0, 30])
 ax[1].invert_yaxis()
 

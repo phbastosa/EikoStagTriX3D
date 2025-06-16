@@ -1,0 +1,48 @@
+#---------------------------------------------------------------------------------------------------
+# Model paramenters --------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+x_samples = 201                            # <int>  
+y_samples = 201                            # <int>  
+z_samples = 151                            # <int>  
+
+x_spacing = 10.0                           # [m] <float> 
+y_spacing = 10.0                           # [m] <float> 
+z_spacing = 10.0                           # [m] <float> 
+
+vp_model_file = ../inputs/models/layer_cake_test_vp.bin
+ro_model_file = ../inputs/models/layer_cake_test_ro.bin
+
+Cijkl_folder = ../inputs/models/layer_cake_test_
+
+#---------------------------------------------------------------------------------------------------
+# Geometry parameters ------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+SPS = ../inputs/geometry/layer_cake_test_SPS.txt              
+RPS = ../inputs/geometry/layer_cake_test_RPS.txt     
+XPS = ../inputs/geometry/layer_cake_test_XPS.txt     
+
+#---------------------------------------------------------------------------------------------------
+# Modeling parameters ------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+# [0] - Elastic ISO
+# [1] - Elastic ANI
+# --------------------------------------------------------------------------------------------------
+
+modeling_type = 0
+
+time_samples = 2001
+time_spacing = 1e-3
+max_frequency = 30.0
+
+boundary_samples = 50
+boundary_damping = 0.0055
+
+snapshot = true
+beg_snap = 800
+end_snap = 800
+num_snap = 1
+
+snapshot_folder = ../outputs/snapshots/
+seismogram_folder = ../outputs/seismograms/

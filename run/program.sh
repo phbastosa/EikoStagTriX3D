@@ -98,6 +98,26 @@ case "$1" in
 	exit 0
 ;;
 
+-test_layer_cake)
+
+    folder=../tests/layer_cake_amp
+    parameters=$folder/parameters.txt
+
+    python3 -B $folder/prepare_models.py
+
+    ./../bin/modeling.exe $parameters
+
+    sed -i "s|modeling_type = 0|modeling_type = 1|g" "$parameters"
+
+    ./../bin/modeling.exe $parameters
+
+    sed -i "s|modeling_type = 1|modeling_type = 0|g" "$parameters"
+
+    python3 -B $folder/prepare_results.py $parameters
+
+	exit 0
+;;
+
 * ) 
 
 	echo -e "\033[31mERRO: Option $1 unknown!\033[m"
