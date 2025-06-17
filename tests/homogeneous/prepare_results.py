@@ -66,11 +66,6 @@ plt.show()
 eikonal_ani = pyf.read_binary_volume(nz, nx, ny, eiko_ani_file)
 snapshot_ani = pyf.read_binary_volume(nz, nx, ny, snap_ani_file)
 
-plt.figure(51)
-plt.imshow(snapshot_ani[:,:,int(0.5*ny)])
-plt.contour(eikonal_ani[:,:,int(0.5*ny)])
-plt.show()
-
 snapshot_ani *= perc / np.max(np.abs(snapshot_ani))
 
 pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 2.0, 

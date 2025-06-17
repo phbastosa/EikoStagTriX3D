@@ -83,15 +83,15 @@ case "$1" in
     folder=../tests/homogeneous
     parameters=$folder/parameters.txt
 
-    # python3 -B $folder/prepare_models.py
+    python3 -B $folder/prepare_models.py
 
-    # ./../bin/modeling.exe $parameters
+    ./../bin/modeling.exe $parameters
 
-    # sed -i "s|modeling_type = 0|modeling_type = 1|g" "$parameters"
+    sed -i "s|modeling_type = 0|modeling_type = 1|g" "$parameters"
 
-    # ./../bin/modeling.exe $parameters
+    ./../bin/modeling.exe $parameters
 
-    # sed -i "s|modeling_type = 1|modeling_type = 0|g" "$parameters"
+    sed -i "s|modeling_type = 1|modeling_type = 0|g" "$parameters"
 
     python3 -B $folder/prepare_results.py $parameters
 
