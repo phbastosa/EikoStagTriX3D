@@ -42,7 +42,7 @@ pyf.plot_model_3D(model, dh, slices, shots = sps_path, scale = 0.6,
                   vmin = 1500, vmax = 2000)
 plt.show()
 
-tId = 800
+tId = 500
 
 snap_iso_file = snapshot_folder +f"elastic_ani_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
 eiko_iso_file = snapshot_folder +f"elastic_ani_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
@@ -105,17 +105,22 @@ mask = freqs > 0
 fft_iso = np.fft.fft(trace_iso)
 fft_ani = np.fft.fft(trace_ani)
 
-fig, ax = plt.subplots(ncols = 2, figsize = (6,8))
+fig, ax = plt.subplots(ncols = 3, figsize = (10,8))
 
-ax[0].plot(trace_iso, times+tlag*dt)
-ax[0].plot(trace_ani, times+tlag*dt)
-ax[0].set_ylim([0.5, (nt-tlag-1)*dt])
+ax[0].plot(seismogram_iso[:,int(0.5*nr)], np.arange(nt)*dt)
+ax[0].plot(seismogram_ani[:,int(0.5*nr)], np.arange(nt)*dt)
+ax[0].set_ylim([0, (nt-1)*dt])
 ax[0].invert_yaxis()
 
-ax[1].plot(np.abs(fft_iso[mask]), freqs[mask], "--o")
-ax[1].plot(np.abs(fft_ani[mask]), freqs[mask], "--o")
-ax[1].set_ylim([0, 30])
+ax[1].plot(trace_iso, times+tlag*dt)
+ax[1].plot(trace_ani, times+tlag*dt)
+ax[1].set_ylim([0.5, (nt-tlag-1)*dt])
 ax[1].invert_yaxis()
+
+ax[2].plot(np.abs(fft_iso[mask]), freqs[mask], "--o")
+ax[2].plot(np.abs(fft_ani[mask]), freqs[mask], "--o")
+ax[2].set_ylim([0, 30])
+ax[2].invert_yaxis()
 
 fig.tight_layout()
 plt.show()

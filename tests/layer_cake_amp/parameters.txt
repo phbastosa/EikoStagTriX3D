@@ -40,8 +40,8 @@ boundary_samples = 50
 boundary_damping = 0.0055
 
 snapshot = true
-beg_snap = 800
-end_snap = 800
+beg_snap = 500
+end_snap = 500
 num_snap = 1
 
 snapshot_folder = ../outputs/snapshots/
