@@ -1,2 +1,2 @@
-# Wavefield Analysis for Seismic Modeling in Elastic Media
+## Wavefield Analysis for Seismic Modeling in Elastic Media
  
