@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import functions as pyf
 
+from matplotlib.gridspec import GridSpec
+
 parameters = str(sys.argv[1])
 
 sps_path = pyf.catch_parameter(parameters,"SPS")
@@ -36,13 +38,7 @@ model = pyf.read_binary_volume(nz, nx, ny, model_file)
 dh = np.array([dx, dy, dz])
 slices = np.array([0.5*nz, 0.5*ny, 0.5*nx], dtype = int)
 
-pyf.plot_model_3D(model, dh, slices, shots = sps_path, scale = 2.0, 
-                  nodes = rps_path, adjx = 0.75, dbar = 1.4,
-                  cblab = "P wave velocity [km/s]", 
-                  vmin = 1600, vmax = 2000)
-plt.show()
-
-tId = 500
+tId = 400
 
 snap_iso_file = snapshot_folder +f"elastic_ani_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
 eiko_iso_file = snapshot_folder +f"elastic_ani_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
@@ -57,9 +53,9 @@ perc = 2000
 
 snapshot_iso *= perc / np.max(np.abs(snapshot_iso))
 
-pyf.plot_model_3D(snapshot_iso, dh, slices, shots = sps_path, scale = 2.0, 
+pyf.plot_model_3D(snapshot_iso, dh, slices, shots = sps_path, scale = 0.4, 
                   nodes = rps_path, eikonal = eikonal_iso, eikonal_levels = [tId*dt], 
-                  eikonal_colors = ["red"] , adjx = 0.75, dbar = 1.4, cmap = "Greys",
+                  eikonal_colors = ["red"] , adjx = 0.5, dbar = 1.25, cmap = "Greys",
                   cblab = "Normalized amplitude - Isotropic", vmin = -0.5*perc, vmax = 0.5*perc)
 plt.show()
 
@@ -68,9 +64,9 @@ snapshot_ani = pyf.read_binary_volume(nz, nx, ny, snap_ani_file)
 
 snapshot_ani *= perc / np.max(np.abs(snapshot_ani))
 
-pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 2.0, 
+pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 0.4, 
                   nodes = rps_path, eikonal = eikonal_ani, eikonal_levels = [tId*dt], 
-                  eikonal_colors = ["red"] , adjx = 0.75, dbar = 1.4, cmap = "Greys",
+                  eikonal_colors = ["red"] , adjx = 0.5, dbar = 1.25, cmap = "Greys",
                   cblab = "Normalized amplitude - Anisotropic", vmin = -0.5*perc, vmax = 0.5*perc)
 plt.show()
 
@@ -80,16 +76,17 @@ seis_ani_path = seismogram_folder +f"elastic_ani_nStations{nr}_nSamples{nt}_shot
 seismogram_iso = pyf.read_binary_matrix(nt, nr, seis_iso_path)
 seismogram_ani = pyf.read_binary_matrix(nt, nr, seis_ani_path)
 
-scale = np.std(seismogram_iso)
+xloc = np.linspace(0, nr-1, 7)
+xlab = np.linspace(0, nr, 7, dtype = int)
 
-fig, ax = plt.subplots(nrows = 2, figsize = (15,8))
+tloc = np.linspace(0, nt-1, 7)
+tlab = np.linspace(0, (nt-1)*dt, 7)
 
-ax[0].imshow(seismogram_iso, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
+rectangle = np.array([[0.5*nr-3, 0.2], [0.5*nr-3, 1.0], 
+                      [0.5*nr+3, 1.0], [0.5*nr+3, 0.2], 
+                      [0.5*nr-3, 0.2]])
 
-ax[1].imshow(seismogram_ani, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
-
-fig.tight_layout()
-plt.show()
+scale = 5*np.std(seismogram_iso)
 
 times = np.arange(nt)*dt
 
@@ -103,17 +100,55 @@ mask = freqs >= 0
 fft_iso = np.fft.fft(trace_iso)
 fft_ani = np.fft.fft(trace_ani)
 
-fig, ax = plt.subplots(ncols = 2, figsize = (6,8))
+t = np.arange(nt)*dt
 
-ax[0].plot(trace_iso, times)
-ax[0].plot(trace_ani, times)
-ax[0].set_ylim([0, (nt-1)*dt])
-ax[0].invert_yaxis()
+ts = slice(int(0.2/dt), int(1.0/dt))
 
-ax[1].plot(np.abs(fft_iso[mask]), freqs[mask])
-ax[1].plot(np.abs(fft_ani[mask]), freqs[mask])
-ax[1].set_ylim([0, 30])
-ax[1].invert_yaxis()
+fig = plt.figure(figsize = (15, 8))
+
+gs = GridSpec(2, 5, figure = fig)
+
+ax1 = fig.add_subplot(gs[:1,:3]) 
+ax1.imshow(seismogram_iso, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
+ax1.plot(rectangle[:,0], rectangle[:,1]/dt, "--k")
+ax1.set_title("Elastic ISO", fontsize = 15)
+ax1.set_xlabel("Trace Index", fontsize = 15)
+ax1.set_ylabel("Time [s]", fontsize = 15)
+ax1.set_xticks(xloc)
+ax1.set_yticks(tloc)
+ax1.set_xticklabels(xlab)
+ax1.set_yticklabels(tlab)
+
+ax2 = fig.add_subplot(gs[1:,:3]) 
+ax2.imshow(seismogram_ani, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
+ax2.plot(rectangle[:,0], rectangle[:,1]/dt, "--k")
+ax2.set_title("Elastic ANI", fontsize = 15)
+ax2.set_xlabel("Trace Index", fontsize = 15)
+ax2.set_ylabel("Time [s]", fontsize = 15)
+ax2.set_xticks(xloc)
+ax2.set_yticks(tloc)
+ax2.set_xticklabels(xlab)
+ax2.set_yticklabels(tlab)
+
+ax3 = fig.add_subplot(gs[:,3:4]) 
+ax3.plot(trace_iso[ts], t[ts], label = "Trace ISO")
+ax3.plot(trace_ani[ts], t[ts], label = "Trace ANI")
+ax3.legend(loc = "lower right", fontsize = 10)
+ax3.set_ylim([0.2, 1.0])
+ax3.invert_yaxis()
+ax3.set_title("Trace", fontsize = 15)
+ax3.set_xlabel("Norm. Amp.", fontsize = 15)
+ax3.set_ylabel("Time [s]", fontsize = 15)
+
+ax4 = fig.add_subplot(gs[:,4:5]) 
+ax4.plot(np.abs(fft_iso[mask]), freqs[mask], label = "Trace ISO")
+ax4.plot(np.abs(fft_ani[mask]), freqs[mask], label = "Trace ANI")
+ax4.legend(loc = "lower right", fontsize = 10)
+ax4.set_ylim([0, 30])
+ax4.invert_yaxis()
+ax4.set_title("Amp. Spectra", fontsize = 15)
+ax4.set_xlabel("Norm. Amp.", fontsize = 15)
+ax4.set_ylabel("Frequency [Hz]", fontsize = 15)
 
 fig.tight_layout()
 plt.show()

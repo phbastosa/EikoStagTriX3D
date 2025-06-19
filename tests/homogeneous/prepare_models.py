@@ -1,8 +1,8 @@
 import numpy as np
 
-nx = 301
+nx = 201
 ny = 201
-nz = 101
+nz = 201
 
 dx = 10.0
 dy = 10.0
@@ -13,14 +13,14 @@ dz = 10.0
 nsx = 1
 nsy = 1
 
-nrx = 291 
+nrx = 91 
 nry = 3
 
 ns = nsx*nsy
 nr = nrx*nry
 
-sx, sy = 1500, 1000 
-rx, ry = np.meshgrid(np.linspace(50, 2950, nrx), 
+sx, sy = 1000, 1000 
+rx, ry = np.meshgrid(np.linspace(50, 1950, nrx), 
                      np.linspace(50, 1950, nry))
 
 SPS = np.zeros((ns, 3), dtype = float)
@@ -54,8 +54,8 @@ vs = np.array([1060])
 ro = np.array([2250])
 z = np.array([])
 
-E1 = np.array([0.1])
-E2 = np.array([0.1])
+E1 = np.array([0.0])
+E2 = np.array([0.0])
 D1 = np.array([0.0])
 D2 = np.array([0.0])
 D3 = np.array([0.0])

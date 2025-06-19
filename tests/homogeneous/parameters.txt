@@ -2,9 +2,9 @@
 # Model paramenters --------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
-x_samples = 301                            # <int>  
+x_samples = 201                            # <int>  
 y_samples = 201                            # <int>  
-z_samples = 101                            # <int>  
+z_samples = 201                            # <int>  
 
 x_spacing = 10.0                           # [m] <float> 
 y_spacing = 10.0                           # [m] <float> 
@@ -32,16 +32,16 @@ XPS = ../inputs/geometry/homogeneous_test_XPS.txt
 
 modeling_type = 0
 
-time_samples = 1001
+time_samples = 1501
 time_spacing = 1e-3
 max_frequency = 30.0
 
 boundary_samples = 50
-boundary_damping = 0.0055
+boundary_damping = 0.0045
 
 snapshot = true
-beg_snap = 500
-end_snap = 500
+beg_snap = 400
+end_snap = 400
 num_snap = 1
 
 snapshot_folder = ../outputs/snapshots/
