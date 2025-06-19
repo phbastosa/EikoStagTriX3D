@@ -1,8 +1,10 @@
 import numpy as np
 
+from sys import argv
+
 nx = 201
 ny = 201
-nz = 151
+nz = 201
 
 dx = 10.0
 dy = 10.0
@@ -13,7 +15,7 @@ dz = 10.0
 nsx = 1
 nsy = 1
 
-nrx = 191 
+nrx = 91 
 nry = 3
 
 ns = nsx*nsy
@@ -29,7 +31,7 @@ XPS = np.zeros((ns, 3), dtype = int)
 
 SPS[:,0] = np.reshape(sx, [ns], order = "F")
 SPS[:,1] = np.reshape(sy, [ns], order = "F")
-SPS[:,2] = np.zeros(ns) 
+SPS[:,2] = np.zeros(ns) + 0.5*(nz-1)*dz
 
 RPS[:,0] = np.reshape(rx, [nr], order = "C")
 RPS[:,1] = np.reshape(ry, [nr], order = "C")
@@ -39,9 +41,9 @@ XPS[:, 0] = np.arange(ns)
 XPS[:, 1] = np.zeros(ns) 
 XPS[:, 2] = np.zeros(ns) + nr 
 
-path_SPS = "../inputs/geometry/layer_cake_test_SPS.txt"
-path_RPS = "../inputs/geometry/layer_cake_test_RPS.txt"
-path_XPS = "../inputs/geometry/layer_cake_test_XPS.txt"
+path_SPS = "../inputs/geometry/anisotropy_test_SPS.txt"
+path_RPS = "../inputs/geometry/anisotropy_test_RPS.txt"
+path_XPS = "../inputs/geometry/anisotropy_test_XPS.txt"
 
 np.savetxt(path_SPS, SPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_RPS, RPS, fmt = "%.2f", delimiter = ",")
@@ -49,22 +51,18 @@ np.savetxt(path_XPS, XPS, fmt = "%.0f", delimiter = ",")
 
 offset = np.sqrt((SPS[0,0] - RPS[:,0])**2 + (SPS[0,1] - RPS[:,1])**2)
 
-vp = np.array([1500,1800,2000])
-vs = np.array([   0,1060,1350])
-ro = np.array([1000,2250,2280])
-z = np.array([500, 500])
+vp = np.array([1800])
+vs = np.array([1060])
+ro = np.array([2250])
+z = np.array([])
 
-E1 = np.array([0.0, 0.0, 0.0])
-E2 = np.array([0.0, 0.0, 0.0])
-D1 = np.array([0.0, 0.0, 0.0])
-D2 = np.array([0.0, 0.0, 0.0])
-D3 = np.array([0.0, 0.0, 0.0])
-G1 = np.array([0.0, 0.0, 0.0])
-G2 = np.array([0.0, 0.0, 0.0])
+E = np.array([float(argv[1])])
+D = np.array([float(argv[2])])
+G = np.array([float(argv[3])])
 
-theta_x = np.array([0.0, 0.0, 0.0]) * np.pi/180.0
-theta_y = np.array([0.0, 0.0, 0.0]) * np.pi/180.0
-theta_z = np.array([0.0, 0.0, 0.0]) * np.pi/180.0
+theta_x = np.array([float(argv[4])]) * np.pi/180.0
+theta_y = np.array([float(argv[5])]) * np.pi/180.0
+theta_z = np.array([0.0]) * np.pi/180.0
 
 Vp = np.zeros((nz, nx, ny))
 Vs = np.zeros((nz, nx, ny))
@@ -114,17 +112,15 @@ for i in range(len(vp)):
     layer = int(np.sum(z[:i])/dz)
 
     c33 = ro[i]*vp[i]**2 / SI
-    c55 = ro[i]*vs[i]**2 / SI
+    c55 = c44 = ro[i]*vs[i]**2 / SI
 
-    c11 = c33*(1.0 + 2.0*E2[i])
-    c22 = c33*(1.0 + 2.0*E1[i])
+    c13 = c23 = np.sqrt((c33 - c55)**2 + 2.0*D[i]*c33*(c33 - c55)) - c55
 
-    c66 = c55*(1.0 + 2.0*G1[i])
-    c44 = c66/(1.0 + 2.0*G2[i])
-
-    c23 = np.sqrt((c33 - c44)**2 + 2.0*D1[i]*c33*(c33 - c44)) - c44
-    c13 = np.sqrt((c33 - c55)**2 + 2.0*D2[i]*c33*(c33 - c55)) - c55
-    c12 = np.sqrt((c11 - c66)**2 + 2.0*D3[i]*c11*(c11 - c66)) - c66
+    c11 = c22 = c33*(1.0 + 2.0*E[i])
+    
+    c66 = c55*(1.0 + 2.0*G[i])
+        
+    c12 = c11 - 2*c66
 
     C[0,0] = c11; C[0,1] = c12; C[0,2] = c13; C[0,3] = c14; C[0,4] = c15; C[0,5] = c16  
     C[1,0] = c12; C[1,1] = c22; C[1,2] = c23; C[1,3] = c24; C[1,4] = c25; C[1,5] = c26  
@@ -175,32 +171,32 @@ for i in range(len(vp)):
     C45[layer:] = Cr[3,4]; C46[layer:] = Cr[3,5]; C55[layer:] = Cr[4,4]; C56[layer:] = Cr[4,5]
     C66[layer:] = Cr[5,5]; 
 
-Vp.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_vp.bin")
-Ro.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_ro.bin")
+Vp.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_vp.bin")
+Ro.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_ro.bin")
 
-C11.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C11.bin")
-C12.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C12.bin")
-C13.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C13.bin")
-C14.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C14.bin")
-C15.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C15.bin")
-C16.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C16.bin")
+C11.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C11.bin")
+C12.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C12.bin")
+C13.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C13.bin")
+C14.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C14.bin")
+C15.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C15.bin")
+C16.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C16.bin")
 
-C22.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C22.bin")
-C23.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C23.bin")
-C24.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C24.bin")
-C25.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C25.bin")
-C26.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C26.bin")
+C22.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C22.bin")
+C23.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C23.bin")
+C24.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C24.bin")
+C25.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C25.bin")
+C26.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C26.bin")
 
-C33.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C33.bin")
-C34.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C34.bin")
-C35.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C35.bin")
-C36.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C36.bin")
+C33.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C33.bin")
+C34.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C34.bin")
+C35.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C35.bin")
+C36.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C36.bin")
 
-C44.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C44.bin")
-C45.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C45.bin")
-C46.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C46.bin")
+C44.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C44.bin")
+C45.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C45.bin")
+C46.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C46.bin")
 
-C55.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C55.bin")
-C56.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C56.bin")
+C55.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C55.bin")
+C56.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C56.bin")
 
-C66.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/layer_cake_test_C66.bin")
+C66.flatten("F").astype(np.float32, order = "F").tofile("../inputs/models/anisotropy_test_C66.bin")

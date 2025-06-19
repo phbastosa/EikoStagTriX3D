@@ -4,24 +4,24 @@
 
 x_samples = 201                            # <int>  
 y_samples = 201                            # <int>  
-z_samples = 151                            # <int>  
+z_samples = 201                            # <int>  
 
 x_spacing = 10.0                           # [m] <float> 
 y_spacing = 10.0                           # [m] <float> 
 z_spacing = 10.0                           # [m] <float> 
 
-vp_model_file = ../inputs/models/layer_cake_test_vp.bin
-ro_model_file = ../inputs/models/layer_cake_test_ro.bin
+vp_model_file = ../inputs/models/anisotropy_test_vp.bin
+ro_model_file = ../inputs/models/anisotropy_test_ro.bin
 
-Cijkl_folder = ../inputs/models/layer_cake_test_
+Cijkl_folder = ../inputs/models/anisotropy_test_
 
 #---------------------------------------------------------------------------------------------------
 # Geometry parameters ------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
-SPS = ../inputs/geometry/layer_cake_test_SPS.txt              
-RPS = ../inputs/geometry/layer_cake_test_RPS.txt     
-XPS = ../inputs/geometry/layer_cake_test_XPS.txt     
+SPS = ../inputs/geometry/anisotropy_test_SPS.txt              
+RPS = ../inputs/geometry/anisotropy_test_RPS.txt     
+XPS = ../inputs/geometry/anisotropy_test_XPS.txt     
 
 #---------------------------------------------------------------------------------------------------
 # Modeling parameters ------------------------------------------------------------------------------
@@ -30,18 +30,18 @@ XPS = ../inputs/geometry/layer_cake_test_XPS.txt
 # [1] - Elastic ANI
 # --------------------------------------------------------------------------------------------------
 
-modeling_type = 0
+modeling_type = 1
 
-time_samples = 2001
+time_samples = 401
 time_spacing = 1e-3
 max_frequency = 30.0
 
 boundary_samples = 50
-boundary_damping = 0.0055
+boundary_damping = 0.0045
 
 snapshot = true
-beg_snap = 500
-end_snap = 500
+beg_snap = 400
+end_snap = 400
 num_snap = 1
 
 snapshot_folder = ../outputs/snapshots/

@@ -98,20 +98,76 @@ case "$1" in
 	exit 0
 ;;
 
--test_layer_cake)
+-test_anisotropy)
 
-    folder=../tests/layer_cake_amp
+    folder=../tests/anisotropy
     parameters=$folder/parameters.txt
 
-    python3 -B $folder/prepare_models.py
+    eikonal_file=../outputs/snapshots/elastic_ani_eikonal_201x201x201_shot_1.bin 
+    snapshot_file=../outputs/snapshots/elastic_ani_snapshot_step400_201x201x201_shot_1.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.0 0.0 0.0 0.0
 
     ./../bin/modeling.exe $parameters
 
-    sed -i "s|modeling_type = 0|modeling_type = 1|g" "$parameters"
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dF_gF_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dF_gF_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.0 0.1 0.0 0.0 0.0
 
     ./../bin/modeling.exe $parameters
 
-    sed -i "s|modeling_type = 1|modeling_type = 0|g" "$parameters"
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eF_dT_gF_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eF_dT_gF_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.0 0.0 0.1 0.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eF_dF_gT_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eF_dF_gT_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.1 0.0 0.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dT_gF_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dT_gF_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.0 0.1 0.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dF_gT_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dF_gT_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.0 0.1 0.1 0.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eF_dT_gT_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eF_dT_gT_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.1 0.1 0.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dT_gT_txF_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dT_gT_txF_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.1 0.1 30.0 0.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dT_gT_txT_tyF.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dT_gT_txT_tyF.bin 
+
+    python3 -B $folder/prepare_models.py 0.1 0.1 0.1 0.0 30.0
+
+    ./../bin/modeling.exe $parameters
+
+    mv $eikonal_file ../outputs/snapshots/anisotropy_eikonal_eT_dT_gT_txF_tyT.bin 
+    mv $snapshot_file ../outputs/snapshots/anisotropy_snapshot_eT_dT_gT_txF_tyT.bin 
 
     python3 -B $folder/prepare_results.py $parameters
 
