@@ -5,8 +5,12 @@
 
 # include "../geometry/geometry.hpp"
 
+# define DGS 5
+
 # define NSWEEPS 8
 # define MESHDIM 3
+
+# define NTHREADS 256
 
 # define COMPRESS 65535
 
@@ -29,22 +33,32 @@ private:
     float * snapshot_in = nullptr;
     float * snapshot_out = nullptr;
 
-    float * d_seismogram = nullptr;
-    float * h_seismogram = nullptr;
+    float * h_seismogram_Ps = nullptr;
+    float * h_seismogram_Vx = nullptr;
+    float * h_seismogram_Vy = nullptr;
+    float * h_seismogram_Vz = nullptr;
+
+    float * d_seismogram_Ps = nullptr;
+    float * d_seismogram_Vx = nullptr;
+    float * d_seismogram_Vy = nullptr;
+    float * d_seismogram_Vz = nullptr;
 
     void set_wavelet();
     void set_dampers();
     void set_eikonal();
 
-    int iDivUp(int a, int b);
+    void set_geometry();
+    void set_snapshots();
+    void set_seismogram();
+
+    void set_wavefields();
 
     void compute_snapshots();
     void compute_seismogram();
 
-    void set_wavefields();
-    void initialization();
-
     void show_time_progress();
+
+    int iDivUp(int a, int b);
 
 protected:
 
@@ -52,18 +66,25 @@ protected:
     int nxx, nyy, nzz, volsize;
     int nt, nx, ny, nz, nb, nPoints;
     int tlag, recId, sIdx, sIdy, sIdz;
-    int nThreads, sBlocks, nBlocks;
     int nsnap, isnap, fsnap;
     int max_spread, timeId;
+    int sBlocks, nBlocks;
 
     float bd, fmax;
 
     int total_levels;    
+    float sx, sy, sz;    
     float dz2i, dx2i, dy2i, dsum;
     float dz2dx2, dz2dy2, dx2dy2;
 
     int * d_sgnv = nullptr;
     int * d_sgnt = nullptr;
+
+    float * d_skw = nullptr;
+    float * d_rkwPs = nullptr;
+    float * d_rkwVx = nullptr;
+    float * d_rkwVy = nullptr;
+    float * d_rkwVz = nullptr;
 
     std::string snapshot_folder;
     std::string seismogram_folder;
@@ -100,13 +121,13 @@ protected:
 
     float * d_wavelet = nullptr;
 
-    virtual void set_specifications() = 0;
-    
+    void eikonal_solver();
+
+    virtual void initialization() = 0;
     virtual void compute_eikonal() = 0;
     virtual void compute_velocity() = 0;
     virtual void compute_pressure() = 0;
-
-    void eikonal_solver();
+    virtual void set_specifications() = 0;
 
     void expand_boundary(float * input, float * output);
     void reduce_boundary(float * input, float * output);
@@ -137,7 +158,7 @@ __global__ void inner_sweep(float * S, float * T, int * sgnt, int * sgnv, int sg
                             int nxx, int nyy, int nzz, float dx, float dy, float dz, float dx2i, float dy2i, float dz2i, 
                             float dz2dx2, float dz2dy2, float dx2dy2, float dsum);
 
-__global__ void compute_seismogram_GPU(float * P, int * rIdx, int * rIdy, int * rIdz, float * seismogram, int spread, int tId, int tlag, int nt, int nxx, int nzz);
+__global__ void compute_seismogram_GPU(float * WF, int * rIdx, int * rIdy, int * rIdz, float * rkw, float * seismogram, int spread, int tId, int tlag, int nt, int nxx, int nzz);
 
 __device__ float get_boundary_damper(float * damp1D, float * damp2D, float * damp3D, int i, int j, int k, int nxx, int nyy, int nzz, int nabc);
 

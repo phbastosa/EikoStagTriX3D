@@ -3,12 +3,8 @@
 
 # include "modeling.cuh"
 
-# define RSGR 2
-
 class Elastic_ANI : public Modeling
 {
-    float * dwc = nullptr;
-
     uintc * d_B = nullptr; float maxB; float minB;
 
     uintc * d_C11 = nullptr; float maxC11; float minC11;
@@ -38,11 +34,12 @@ class Elastic_ANI : public Modeling
 
     uintc * d_C66 = nullptr; float maxC66; float minC66;
 
-    void set_specifications();
-
+    void initialization();
     void compute_eikonal();
     void compute_velocity();
     void compute_pressure();
+
+    void set_specifications();
 };
 
 __global__ void get_quasi_slowness(float * T, float * S, float dx, float dy, float dz, int sIdx, int sIdy, int sIdz, int nxx, int nyy, int nzz, int nb,
@@ -56,8 +53,8 @@ __global__ void get_quasi_slowness(float * T, float * S, float dx, float dy, flo
 
 
 __global__ void compute_velocity_rsg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, uintc * B, float minB, 
-                                     float maxB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float * dwc, float dx, float dy, float dz, float dt, int tId, 
-                                     int tlag, int sIdx, int sIdy, int sIdz, int nxx, int nyy, int nzz, int nb, int nt);
+                                     float maxB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, 
+                                     int tlag, int sIdx, int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt);
 
 __global__ void compute_pressure_rsg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * P, float * T, 
                                      uintc * C11, uintc * C12, uintc * C13, uintc * C14, uintc * C15, uintc * C16, uintc * C22, uintc * C23, uintc * C24, uintc * C25, 

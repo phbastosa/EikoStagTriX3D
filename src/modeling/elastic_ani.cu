@@ -5,37 +5,6 @@ void Elastic_ANI::set_specifications()
     modeling_type = "elastic_ani";
     modeling_name = "Modeling type: Elastic anisotropic solver";
 
-    int samples = 2*RSGR+1;
-    int nKernel = samples*samples*samples;
-    float * kernel = new float[nKernel]();
-
-    int index = 0;
-    float sum = 0.0f;
-
-    for (int z = -RSGR; z <= RSGR; z++)
-    {
-        for (int x = -RSGR; x <= RSGR; x++)
-        {
-            for (int y = -RSGR; y <= RSGR; y++)
-            {          
-                float r = sqrtf(x*x + y*y + z*z);
-
-                kernel[index] = 1.0f/sqrtf(2.0f*M_PI)*expf(-0.5f*r*r);
-    
-                sum += kernel[index]; 
-            
-                ++index;
-            }
-        }
-    }
-
-    for (index = 0; index < nKernel; index++) 
-        kernel[index] /= sum;
-
-    cudaMalloc((void**)&(dwc), nKernel*sizeof(float));
-    cudaMemcpy(dwc, kernel, nKernel*sizeof(float), cudaMemcpyHostToDevice);
-    delete[] kernel;
-
     auto * Cij = new float[nPoints]();
 
     std::string vp_file = catch_parameter("vp_model_file", parameters);
@@ -280,22 +249,106 @@ void Elastic_ANI::set_specifications()
     delete[] Cij;
 }
 
+void Elastic_ANI::initialization()
+{
+    float beta = 5.0f;
+
+    sx = geometry->xsrc[geometry->sInd[srcId]];
+    sy = geometry->ysrc[geometry->sInd[srcId]];
+    sz = geometry->zsrc[geometry->sInd[srcId]];
+
+    sIdx = (int)((sx + 0.5f*dx) / dx);
+    sIdy = (int)((sy + 0.5f*dy) / dy);
+    sIdz = (int)((sz + 0.5f*dz) / dz);
+
+    float * h_skw = new float[DGS*DGS*DGS]();
+
+    auto skw = gaussian_weights(sx, sy, sz, sIdx, sIdy, sIdz, dx, dy, dz);
+
+    for (int yId = 0; yId < DGS; yId++)
+        for (int xId = 0; xId < DGS; xId++)
+            for (int zId = 0; zId < DGS; zId++)
+                h_skw[zId + xId*DGS + yId*DGS*DGS] = skw[zId][xId][yId];
+
+    sIdx += nb; 
+    sIdy += nb; 
+    sIdz += nb;
+
+    int * h_rIdx = new int[max_spread]();
+    int * h_rIdy = new int[max_spread]();
+    int * h_rIdz = new int[max_spread]();
+
+    float * h_rkwPs = new float[DGS*DGS*DGS*max_spread]();
+    float * h_rkwVx = new float[DGS*DGS*DGS*max_spread]();
+    float * h_rkwVy = new float[DGS*DGS*DGS*max_spread]();
+    float * h_rkwVz = new float[DGS*DGS*DGS*max_spread]();
+
+    int spreadId = 0;
+
+    for (recId = geometry->iRec[srcId]; recId < geometry->fRec[srcId]; recId++)
+    {
+        float rx = geometry->xrec[recId];
+        float ry = geometry->yrec[recId];
+        float rz = geometry->zrec[recId];
+        
+        int rIdx = (int)((rx + 0.5f*dx) / dx);
+        int rIdy = (int)((ry + 0.5f*dy) / dy);
+        int rIdz = (int)((rz + 0.5f*dz) / dz);
+    
+        auto rkwPs = kaiser_weights(rx, ry, rz, rIdx, rIdy, rIdz, dx, dy, dz, beta);
+        auto rkwVx = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz, beta);
+        auto rkwVy = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz, beta);
+        auto rkwVz = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz, beta);
+        
+        for (int zId = 0; zId < DGS; zId++)
+        {
+            for (int xId = 0; xId < DGS; xId++)
+            {
+                for (int kId = 0; kId < DGS; kId++)
+                {
+                    h_rkwPs[zId + xId*DGS + kId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwPs[zId][xId][kId];
+                    h_rkwVx[zId + xId*DGS + kId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVx[zId][xId][kId];
+                    h_rkwVy[zId + xId*DGS + kId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVy[zId][xId][kId];
+                    h_rkwVz[zId + xId*DGS + kId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVz[zId][xId][kId];
+                }
+            }
+        }
+
+        h_rIdx[spreadId] = rIdx + nb;
+        h_rIdy[spreadId] = rIdy + nb;
+        h_rIdz[spreadId] = rIdz + nb;
+
+        ++spreadId;
+    }
+
+    cudaMemcpy(d_skw, h_skw, DGS*DGS*DGS*sizeof(float), cudaMemcpyHostToDevice);
+
+    cudaMemcpy(d_rkwPs, h_rkwPs, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_rkwVx, h_rkwVx, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_rkwVz, h_rkwVz, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
+
+    cudaMemcpy(d_rIdx, h_rIdx, max_spread*sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_rIdy, h_rIdy, max_spread*sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_rIdz, h_rIdz, max_spread*sizeof(int), cudaMemcpyHostToDevice);
+
+    delete[] h_skw;
+    delete[] h_rkwPs;
+    delete[] h_rkwVx;
+    delete[] h_rkwVz;
+    delete[] h_rIdx;
+    delete[] h_rIdz;
+}
+
 void Elastic_ANI::compute_eikonal()
 {
-    float sx = geometry->xsrc[geometry->sInd[srcId]];
-    float sy = geometry->ysrc[geometry->sInd[srcId]];
-    float sz = geometry->zsrc[geometry->sInd[srcId]];
-
     dim3 grid(1,1,1);
     dim3 block(MESHDIM,MESHDIM,MESHDIM);
 
-    time_set<<<nBlocks,nThreads>>>(d_T, volsize);
-    
+    time_set<<<nBlocks,NTHREADS>>>(d_T, volsize);
     time_init<<<grid,block>>>(d_T,d_S,sx,sy,sz,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nzz,nb);
-
     eikonal_solver();
 
-    get_quasi_slowness<<<nBlocks,nThreads>>>(d_T,d_S,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,d_C11, 
+    get_quasi_slowness<<<nBlocks,NTHREADS>>>(d_T,d_S,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,d_C11, 
                                              d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,d_C23,d_C24,d_C25, 
                                              d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55, 
                                              d_C56,d_C66,minC11,maxC11,minC12,maxC12,minC13,maxC13,
@@ -305,10 +358,8 @@ void Elastic_ANI::compute_eikonal()
                                              minC44,maxC44,minC45,maxC45,minC46,maxC46,minC55,maxC55,
                                              minC56,maxC56,minC66,maxC66);
 
-    time_set<<<nBlocks,nThreads>>>(d_T, volsize);
-    
+    time_set<<<nBlocks,NTHREADS>>>(d_T, volsize);    
     time_init<<<grid,block>>>(d_T,d_S,sx,sy,sz,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nzz,nb);
-
     eikonal_solver();
 
     cudaMemcpy(d_S, S, volsize * sizeof(float), cudaMemcpyHostToDevice);
@@ -316,21 +367,21 @@ void Elastic_ANI::compute_eikonal()
 
 void Elastic_ANI::compute_velocity()
 {
-    compute_velocity_rsg<<<nBlocks, nThreads>>>(d_Vx, d_Vy, d_Vz, d_Txx, d_Tyy, d_Tzz, d_Txz, d_Tyz, d_Txy, d_T, d_B, minB, maxB, d1D, d2D, 
-                                                d3D, d_wavelet, dwc, dx, dy, dz, dt, timeId, tlag, sIdx, sIdy, sIdz, nxx, nyy, nzz, nb, nt);
+    compute_velocity_rsg<<<nBlocks,NTHREADS>>>(d_Vx, d_Vy, d_Vz, d_Txx, d_Tyy, d_Tzz, d_Txz, d_Tyz, d_Txy, d_T, d_B, minB, maxB, d1D, d2D, 
+                                               d3D, d_wavelet, dx, dy, dz, dt, timeId, tlag, sIdx, sIdy, sIdz, d_skw, nxx, nyy, nzz, nb, nt);
 }
 
 void Elastic_ANI::compute_pressure()
 {
-    compute_pressure_rsg<<<nBlocks, nThreads>>>(d_Vx, d_Vy, d_Vz, d_Txx, d_Tyy, d_Tzz, d_Txz, d_Tyz, d_Txy, d_P, d_T, 
-                                                d_C11, d_C12, d_C13, d_C14, d_C15, d_C16, d_C22, d_C23, d_C24, d_C25, 
-                                                d_C26, d_C33, d_C34, d_C35, d_C36, d_C44, d_C45, d_C46, d_C55, d_C56, 
-                                                d_C66, timeId, tlag, dx, dy, dz, dt, nxx, nyy, nzz, minC11, maxC11, minC12, 
-                                                maxC12, minC13, maxC13, minC14, maxC14, minC15, maxC15, minC16, maxC16, 
-                                                minC22, maxC22, minC23, maxC23, minC24, maxC24, minC25, maxC25, minC26, 
-                                                maxC26, minC33, maxC33, minC34, maxC34, minC35, maxC35, minC36, maxC36, 
-                                                minC44, maxC44, minC45, maxC45, minC46, maxC46, minC55, maxC55, minC56, 
-                                                maxC56, minC66, maxC66);
+    compute_pressure_rsg<<<nBlocks,NTHREADS>>>(d_Vx, d_Vy, d_Vz, d_Txx, d_Tyy, d_Tzz, d_Txz, d_Tyz, d_Txy, d_P, d_T, 
+                                               d_C11, d_C12, d_C13, d_C14, d_C15, d_C16, d_C22, d_C23, d_C24, d_C25, 
+                                               d_C26, d_C33, d_C34, d_C35, d_C36, d_C44, d_C45, d_C46, d_C55, d_C56, 
+                                               d_C66, timeId, tlag, dx, dy, dz, dt, nxx, nyy, nzz, minC11, maxC11, minC12, 
+                                               maxC12, minC13, maxC13, minC14, maxC14, minC15, maxC15, minC16, maxC16, 
+                                               minC22, maxC22, minC23, maxC23, minC24, maxC24, minC25, maxC25, minC26, 
+                                               maxC26, minC33, maxC33, minC34, maxC34, minC35, maxC35, minC36, maxC36, 
+                                               minC44, maxC44, minC45, maxC45, minC46, maxC46, minC55, maxC55, minC56, 
+                                               maxC56, minC66, maxC66);
     
 }
 
@@ -486,8 +537,8 @@ __global__ void get_quasi_slowness(float * T, float * S, float dx, float dy, flo
 
 
 __global__ void compute_velocity_rsg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, uintc * B, float minB, 
-                                     float maxB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float * dwc, float dx, float dy, float dz, float dt, int tId, 
-                                     int tlag, int sIdx, int sIdy, int sIdz, int nxx, int nyy, int nzz, int nb, int nt)
+                                     float maxB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, 
+                                     int tlag, int sIdx, int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -497,19 +548,21 @@ __global__ void compute_velocity_rsg(float * Vx, float * Vy, float * Vz, float *
 
     if ((index == 0) && (tId < nt))
     {
-        int sId = 0;
-
-        for (int si = -RSGR; si <= RSGR; si++)
+        for (int k = 0; k < DGS; k++)
         {
-            for (int sj = -RSGR; sj <= RSGR; sj++)
+            int yi = sIdy + k - 2;
+            
+            for (int j = 0; j < DGS; j++)
             {
-                for (int sk = -RSGR; sk <= RSGR; sk++)
+                int xi = sIdx + j - 2;
+    
+                for (int i = 0; i < DGS; i++)
                 {
-                    Txx[(sIdz+si) + (sIdx+sj)*nzz + (sIdy+sk)*nxx*nzz] += dwc[sId]*wavelet[tId] / (dx*dy*dz);
-                    Tyy[(sIdz+si) + (sIdx+sj)*nzz + (sIdy+sk)*nxx*nzz] += dwc[sId]*wavelet[tId] / (dx*dy*dz);
-                    Tzz[(sIdz+si) + (sIdx+sj)*nzz + (sIdy+sk)*nxx*nzz] += dwc[sId]*wavelet[tId] / (dx*dy*dz);                            
-                    
-                    ++sId;
+                    int zi = sIdz + i - 2;
+            
+                    Txx[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
+                    Tyy[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
+                    Tzz[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);           
                 }
             }
         }
