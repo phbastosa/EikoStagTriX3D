@@ -183,25 +183,17 @@ std::vector<std::vector<std::vector<float>>> gaussian_weights(float x, float y, 
 
     std::vector<std::vector<std::vector<float>>> weights(N, std::vector<std::vector<float>>(N, std::vector<float>(N)));
 
-    float rmax = 2.0f*sqrtf(dx*dx + dy*dy + dz*dz);
-
     for (int i = 0; i < N; ++i) 
     {    
-        float zi = (iz0 + i - 2) * dz;
-        
         for (int j = 0; j < N; ++j) 
         {
-            float xj = (ix0 + j - 2) * dx;
-
             for (int k = 0; k < N; ++k) 
             {
-                float yk = (iy0 + k - 2) * dy;
+                float z = (float)(i - 2);        
+                float x = (float)(j - 2);
+                float y = (float)(k - 2);
 
-                float rz = z - zi;
-                float rx = x - xj;
-                float ry = y - yk;
-
-                float r = sqrtf(rx * rx + ry * ry + rz * rz) / rmax;
+                float r = sqrtf(x*x + y*y + z*z);
 
                 weights[i][j][k] = 1.0f/sqrtf(2.0f*M_PI)*expf(-0.5f*r*r);
 

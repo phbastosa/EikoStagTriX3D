@@ -40,8 +40,8 @@ slices = np.array([0.5*nz, 0.5*ny, 0.5*nx], dtype = int)
 
 tId = 400
 
-snap_iso_file = snapshot_folder +f"elastic_ani_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
-eiko_iso_file = snapshot_folder +f"elastic_ani_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
+snap_iso_file = snapshot_folder +f"elastic_iso_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
+eiko_iso_file = snapshot_folder +f"elastic_iso_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
 
 snap_ani_file = snapshot_folder +f"elastic_ani_snapshot_step{tId}_{nz}x{nx}x{ny}_shot_1.bin" 
 eiko_ani_file = snapshot_folder +f"elastic_ani_eikonal_{nz}x{nx}x{ny}_shot_1.bin"
@@ -70,8 +70,8 @@ pyf.plot_model_3D(snapshot_ani, dh, slices, shots = sps_path, scale = 0.4,
                   cblab = "Normalized amplitude - Anisotropic", vmin = -0.5*perc, vmax = 0.5*perc)
 plt.show()
 
-seis_iso_path = seismogram_folder +f"elastic_iso_nStations{nr}_nSamples{nt}_shot_1.bin"
-seis_ani_path = seismogram_folder +f"elastic_ani_nStations{nr}_nSamples{nt}_shot_1.bin"
+seis_iso_path = seismogram_folder +f"elastic_iso_Ps_nStations{nr}_nSamples{nt}_shot_1.bin"
+seis_ani_path = seismogram_folder +f"elastic_ani_Ps_nStations{nr}_nSamples{nt}_shot_1.bin"
 
 seismogram_iso = pyf.read_binary_matrix(nt, nr, seis_iso_path)
 seismogram_ani = pyf.read_binary_matrix(nt, nr, seis_ani_path)
