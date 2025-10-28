@@ -119,10 +119,11 @@ float bessel_i0(float x)
     return sum;
 }
 
-std::vector<std::vector<std::vector<float>>> kaiser_weights(float x, float y, float z, int ix0, int iy0, int iz0, float dx, float dy, float dz, float beta) 
+std::vector<std::vector<std::vector<float>>> kaiser_weights(float x, float y, float z, int ix0, int iy0, int iz0, float dx, float dy, float dz) 
 {
-    const int N = 5;
+    const int N = 8;
     float sum = 0.0f;
+    float beta = 6.41f;
 
     std::vector<std::vector<std::vector<float>>> weights(N, std::vector<std::vector<float>>(N, std::vector<float>(N)));
 
@@ -131,17 +132,17 @@ std::vector<std::vector<std::vector<float>>> kaiser_weights(float x, float y, fl
 
     for (int i = 0; i < N; ++i) 
     {    
-        float zi = (iz0 + i - 2) * dz;
+        float zi = (iz0 + i - 3) * dz;
         float dzr = (z - zi) / dz;
         
         for (int j = 0; j < N; ++j) 
         {
-            float xj = (ix0 + j - 2) * dx;
+            float xj = (ix0 + j - 3) * dx;
             float dxr = (x - xj) / dx;
 
             for (int k = 0; k < N; ++k) 
             {
-                float yk = (iy0 + k - 2) * dy;
+                float yk = (iy0 + k - 3) * dy;
                 float dyr = (y - yk) / dy;
 
                 float rz = z - zi;
@@ -178,7 +179,7 @@ std::vector<std::vector<std::vector<float>>> kaiser_weights(float x, float y, fl
 
 std::vector<std::vector<std::vector<float>>> gaussian_weights(float x, float y, float z, int ix0, int iy0, int iz0, float dx, float dy, float dz)
 {
-    const int N = 5;
+    const int N = 8;
     float sum = 0.0f;
 
     std::vector<std::vector<std::vector<float>>> weights(N, std::vector<std::vector<float>>(N, std::vector<float>(N)));
@@ -189,9 +190,9 @@ std::vector<std::vector<std::vector<float>>> gaussian_weights(float x, float y, 
         {
             for (int k = 0; k < N; ++k) 
             {
-                float z = (float)(i - 2);        
-                float x = (float)(j - 2);
-                float y = (float)(k - 2);
+                float z = (float)(i - 3);        
+                float x = (float)(j - 3);
+                float y = (float)(k - 3);
 
                 float r = sqrtf(x*x + y*y + z*z);
 

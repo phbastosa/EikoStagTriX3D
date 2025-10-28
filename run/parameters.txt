@@ -2,47 +2,50 @@
 # Model paramenters --------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
-x_samples = 101                            # <int>  
-y_samples = 101                            # <int>  
-z_samples = 101                            # <int>  
+x_samples = 301                            # <int>  
+y_samples = 301                            # <int>  
+z_samples = 51                             # <int>  
 
 x_spacing = 10.0                           # [m] <float> 
 y_spacing = 10.0                           # [m] <float> 
 z_spacing = 10.0                           # [m] <float> 
 
-vp_model_file = ../inputs/models/anisoTest_vp.bin
-ro_model_file = ../inputs/models/anisoTest_ro.bin
+slowness_file = ../inputs/models/EikoStagTriX3D_slowness.bin
+buoyancy_file = ../inputs/models/EikoStagTriX3D_buoyancy.bin
 
-Cijkl_folder = ../inputs/models/anisoTest_
+Cijkl_folder = ../inputs/models/EikoStagTriX3D_
 
 #---------------------------------------------------------------------------------------------------
 # Geometry parameters ------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
-SPS = ../inputs/geometry/anisoTest_SPS.txt              
-RPS = ../inputs/geometry/anisoTest_RPS.txt     
-XPS = ../inputs/geometry/anisoTest_XPS.txt     
+SPS = ../inputs/geometry/EikoStagTriX3D_SPS.txt              
+RPS = ../inputs/geometry/EikoStagTriX3D_RPS.txt     
+XPS = ../inputs/geometry/EikoStagTriX3D_XPS.txt     
 
 #---------------------------------------------------------------------------------------------------
 # Modeling parameters ------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
-# [0] - Elastic ISO
-# [1] - Elastic ANI
+# [0] - Triclinic SSG
+# [1] - Triclinic RSG
 # --------------------------------------------------------------------------------------------------
 
-modeling_type = 0
+modeling_type = 1
 
-time_samples = 1501
+eikonalClip = true
+compression = true
+
+time_samples = 3001
 time_spacing = 1e-3
-max_frequency = 50.0
+max_frequency = 30.0
 
 boundary_samples = 50
-boundary_damping = 0.0055
+boundary_damping = 0.0045
 
-snapshot = false
-beg_snap = 1000
+snapshot = true
+beg_snap = 500
 end_snap = 1000
-num_snap = 1
+num_snap = 2
 
 snapshot_folder = ../outputs/snapshots/
 seismogram_folder = ../outputs/seismograms/

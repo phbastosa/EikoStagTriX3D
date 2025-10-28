@@ -24,6 +24,64 @@ def read_binary_volume(n1, n2, n3, filename):
     data = np.fromfile(filename, dtype = np.float32, count = n1*n2*n3)    
     return np.reshape(data, [n1, n2, n3], order = 'F')
 
+def analytical_orthorhombic_solver(vp, ep1, ep2, dl1, dl2, dl3, tilt, azmt, sx, sy, sz, time):
+
+    spacing = np.pi/100
+
+    angles = np.arange(0, 2.0*np.pi + spacing, spacing)
+
+    c = np.cos(-tilt); s = np.sin(-tilt)
+    Rtilt = np.array([[c,0,s], [0,1,0], [-s,0,c]])
+
+    c = np.cos(-azmt); s = np.sin(-azmt)
+    Razmt = np.array([[c,-s,0], [s,c,0], [0,0,1]])
+        
+    R = Rtilt @ Razmt           
+
+    qVp_xy = np.zeros_like(angles)
+    qVp_xz = np.zeros_like(angles)
+    qVp_yz = np.zeros_like(angles)
+
+    for k, angle in enumerate(angles):
+
+        p_xy = np.array([np.cos(angle), np.sin(angle), 0])
+        p_xz = np.array([np.cos(angle), 0, np.sin(angle)])
+        p_yz = np.array([0, np.cos(angle), np.sin(angle)])
+
+        p_xy = R @ p_xy
+        p_xz = R @ p_xz
+        p_yz = R @ p_yz
+
+        theta_xy = np.arccos(p_xy[-1] / np.linalg.norm(p_xy))
+        theta_xz = np.arccos(p_xz[-1] / np.linalg.norm(p_xz))
+        theta_yz = np.arccos(p_yz[-1] / np.linalg.norm(p_yz))
+
+        phi_xy = np.arctan2(p_xy[1], p_xy[0])
+        phi_xz = np.arctan2(p_xz[1], p_xz[0])
+        phi_yz = np.arctan2(p_yz[1], p_yz[0])
+
+        dl_xy = dl1*np.sin(phi_xy)**2 + dl2*np.cos(phi_xy)**2
+        dl_xz = dl1*np.sin(phi_xz)**2 + dl2*np.cos(phi_xz)**2
+        dl_yz = dl1*np.sin(phi_yz)**2 + dl2*np.cos(phi_yz)**2
+
+        ep_xy = ep1*np.sin(phi_xy)**4 + ep2*np.cos(phi_xy)**4 + (2*ep2 + dl3)*np.sin(phi_xy)**2*np.cos(phi_xy)**2
+        ep_xz = ep1*np.sin(phi_xz)**4 + ep2*np.cos(phi_xz)**4 + (2*ep2 + dl3)*np.sin(phi_xz)**2*np.cos(phi_xz)**2
+        ep_yz = ep1*np.sin(phi_yz)**4 + ep2*np.cos(phi_yz)**4 + (2*ep2 + dl3)*np.sin(phi_yz)**2*np.cos(phi_yz)**2
+
+        qVp_xy[k] = vp*(1.0 + dl_xy*np.sin(theta_xy)**2*np.cos(theta_xy)**2 + ep_xy*np.sin(theta_xy)**4)
+        qVp_xz[k] = vp*(1.0 + dl_xz*np.sin(theta_xz)**2*np.cos(theta_xz)**2 + ep_xz*np.sin(theta_xz)**4)
+        qVp_yz[k] = vp*(1.0 + dl_yz*np.sin(theta_yz)**2*np.cos(theta_yz)**2 + ep_yz*np.sin(theta_yz)**4)
+
+    x_xy = time*qVp_xy*np.cos(angles) + sx    
+    x_xz = time*qVp_xz*np.cos(angles) + sx   
+    y_yz = time*qVp_yz*np.cos(angles) + sy    
+
+    y_xy = time*qVp_xy*np.sin(angles) + sy    
+    z_xz = time*qVp_xz*np.sin(angles) + sz    
+    z_yz = time*qVp_yz*np.sin(angles) + sz    
+
+    return x_xy, y_xy, x_xz, z_xz, y_yz, z_yz
+
 def plot_model_3D(model, dh, slices, **kwargs):
 
     m2km = 1e-3
