@@ -561,12 +561,12 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c66_3 = (minC66 + (static_cast<float>(C66[i + j*nzz + (k+1)*nxx*nzz]) - 1.0f) * (maxC66 - minC66) / (COMPRESS - 1));
             c66_4 = (minC66 + (static_cast<float>(C66[i + j*nzz + k*nxx*nzz]) - 1.0f) * (maxC66 - minC66) / (COMPRESS - 1));
  
-            float c16 = __frcp_rn(0.25f*(1.0f/c16_1 + 1.0f/c16_2 + 1.0f/c16_3 + 1.0f/c16_4));
-            float c26 = __frcp_rn(0.25f*(1.0f/c26_1 + 1.0f/c26_2 + 1.0f/c26_3 + 1.0f/c26_4));
-            float c36 = __frcp_rn(0.25f*(1.0f/c36_1 + 1.0f/c36_2 + 1.0f/c36_3 + 1.0f/c36_4));
-            float c46 = __frcp_rn(0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
-            float c56 = __frcp_rn(0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
-            float c66 = __frcp_rn(0.25f*(1.0f/c66_1 + 1.0f/c66_2 + 1.0f/c66_3 + 1.0f/c66_4));            
+            float c16 = 1.0f / (0.25f*(1.0f/c16_1 + 1.0f/c16_2 + 1.0f/c16_3 + 1.0f/c16_4));
+            float c26 = 1.0f / (0.25f*(1.0f/c26_1 + 1.0f/c26_2 + 1.0f/c26_3 + 1.0f/c26_4));
+            float c36 = 1.0f / (0.25f*(1.0f/c36_1 + 1.0f/c36_2 + 1.0f/c36_3 + 1.0f/c36_4));
+            float c46 = 1.0f / (0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
+            float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
+            float c66 = 1.0f / (0.25f*(1.0f/c66_1 + 1.0f/c66_2 + 1.0f/c66_3 + 1.0f/c66_4));            
 
             Txy[index] += dt*(c16*dVx_dx + c66*dVx_dy + c56*dVx_dz +
                               c66*dVy_dx + c26*dVy_dy + c46*dVy_dz +
@@ -650,12 +650,12 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c56_3 = (minC56 + (static_cast<float>(C56[(i+1) + j*nzz + k*nxx*nzz]) - 1.0f) * (maxC56 - minC56) / (COMPRESS - 1));
             c56_4 = (minC56 + (static_cast<float>(C56[i + j*nzz + k*nxx*nzz]) - 1.0f) * (maxC56 - minC56) / (COMPRESS - 1));
 
-            float c15 = __frcp_rn(0.25f*(1.0f/c15_1 + 1.0f/c15_2 + 1.0f/c15_3 + 1.0f/c15_4));
-            float c25 = __frcp_rn(0.25f*(1.0f/c25_1 + 1.0f/c25_2 + 1.0f/c25_3 + 1.0f/c25_4));
-            float c35 = __frcp_rn(0.25f*(1.0f/c35_1 + 1.0f/c35_2 + 1.0f/c35_3 + 1.0f/c35_4));
-            float c45 = __frcp_rn(0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
-            float c55 = __frcp_rn(0.25f*(1.0f/c55_1 + 1.0f/c55_2 + 1.0f/c55_3 + 1.0f/c55_4));
-            float c56 = __frcp_rn(0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
+            float c15 = 1.0f / (0.25f*(1.0f/c15_1 + 1.0f/c15_2 + 1.0f/c15_3 + 1.0f/c15_4));
+            float c25 = 1.0f / (0.25f*(1.0f/c25_1 + 1.0f/c25_2 + 1.0f/c25_3 + 1.0f/c25_4));
+            float c35 = 1.0f / (0.25f*(1.0f/c35_1 + 1.0f/c35_2 + 1.0f/c35_3 + 1.0f/c35_4));
+            float c45 = 1.0f / (0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
+            float c55 = 1.0f / (0.25f*(1.0f/c55_1 + 1.0f/c55_2 + 1.0f/c55_3 + 1.0f/c55_4));
+            float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
 
             Txz[index] += dt*(c15*dVx_dx + c56*dVx_dy + c55*dVx_dz +
                               c56*dVy_dx + c25*dVy_dy + c45*dVy_dz +
@@ -739,12 +739,12 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c46_3 = (minC46 + (static_cast<float>(C46[(i+1) + j*nzz + k*nxx*nzz]) - 1.0f) * (maxC46 - minC46) / (COMPRESS - 1));
             c46_4 = (minC46 + (static_cast<float>(C46[i + j*nzz + k*nxx*nzz]) - 1.0f) * (maxC46 - minC46) / (COMPRESS - 1));
 
-            float c14 = __frcp_rn(0.25f*(1.0f/c14_1 + 1.0f/c14_2 + 1.0f/c14_3 + 1.0f/c14_4));
-            float c24 = __frcp_rn(0.25f*(1.0f/c24_1 + 1.0f/c24_2 + 1.0f/c24_3 + 1.0f/c24_4));
-            float c34 = __frcp_rn(0.25f*(1.0f/c34_1 + 1.0f/c34_2 + 1.0f/c34_3 + 1.0f/c34_4));
-            float c44 = __frcp_rn(0.25f*(1.0f/c44_1 + 1.0f/c44_2 + 1.0f/c44_3 + 1.0f/c44_4));
-            float c45 = __frcp_rn(0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
-            float c46 = __frcp_rn(0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
+            float c14 = 1.0f / (0.25f*(1.0f/c14_1 + 1.0f/c14_2 + 1.0f/c14_3 + 1.0f/c14_4));
+            float c24 = 1.0f / (0.25f*(1.0f/c24_1 + 1.0f/c24_2 + 1.0f/c24_3 + 1.0f/c24_4));
+            float c34 = 1.0f / (0.25f*(1.0f/c34_1 + 1.0f/c34_2 + 1.0f/c34_3 + 1.0f/c34_4));
+            float c44 = 1.0f / (0.25f*(1.0f/c44_1 + 1.0f/c44_2 + 1.0f/c44_3 + 1.0f/c44_4));
+            float c45 = 1.0f / (0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
+            float c46 = 1.0f / (0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
 
             Tyz[index] += dt*(c14*dVx_dx + c46*dVx_dy + c45*dVx_dz +
                               c46*dVy_dx + c24*dVy_dy + c44*dVy_dz +
@@ -925,12 +925,12 @@ __global__ void float_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c66_3 = C66[i + j*nzz + (k+1)*nxx*nzz];
             c66_4 = C66[i + j*nzz + k*nxx*nzz];
 
-            float c16 = __frcp_rn(0.25f*(1.0f/c16_1 + 1.0f/c16_2 + 1.0f/c16_3 + 1.0f/c16_4));
-            float c26 = __frcp_rn(0.25f*(1.0f/c26_1 + 1.0f/c26_2 + 1.0f/c26_3 + 1.0f/c26_4));
-            float c36 = __frcp_rn(0.25f*(1.0f/c36_1 + 1.0f/c36_2 + 1.0f/c36_3 + 1.0f/c36_4));
-            float c46 = __frcp_rn(0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
-            float c56 = __frcp_rn(0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
-            float c66 = __frcp_rn(0.25f*(1.0f/c66_1 + 1.0f/c66_2 + 1.0f/c66_3 + 1.0f/c66_4));
+            float c16 = 1.0f / (0.25f*(1.0f/c16_1 + 1.0f/c16_2 + 1.0f/c16_3 + 1.0f/c16_4));
+            float c26 = 1.0f / (0.25f*(1.0f/c26_1 + 1.0f/c26_2 + 1.0f/c26_3 + 1.0f/c26_4));
+            float c36 = 1.0f / (0.25f*(1.0f/c36_1 + 1.0f/c36_2 + 1.0f/c36_3 + 1.0f/c36_4));
+            float c46 = 1.0f / (0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
+            float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
+            float c66 = 1.0f / (0.25f*(1.0f/c66_1 + 1.0f/c66_2 + 1.0f/c66_3 + 1.0f/c66_4));
 
             Txy[index] += dt*(c16*dVx_dx + c66*dVx_dy + c56*dVx_dz +
                               c66*dVy_dx + c26*dVy_dy + c46*dVy_dz +
@@ -1014,12 +1014,12 @@ __global__ void float_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c56_3 = C56[(i+1) + j*nzz + k*nxx*nzz];
             c56_4 = C56[i + j*nzz + k*nxx*nzz];
 
-            float c15 = __frcp_rn(0.25f*(1.0f/c15_1 + 1.0f/c15_2 + 1.0f/c15_3 + 1.0f/c15_4));
-            float c25 = __frcp_rn(0.25f*(1.0f/c25_1 + 1.0f/c25_2 + 1.0f/c25_3 + 1.0f/c25_4));
-            float c35 = __frcp_rn(0.25f*(1.0f/c35_1 + 1.0f/c35_2 + 1.0f/c35_3 + 1.0f/c35_4));
-            float c45 = __frcp_rn(0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
-            float c55 = __frcp_rn(0.25f*(1.0f/c55_1 + 1.0f/c55_2 + 1.0f/c55_3 + 1.0f/c55_4));
-            float c56 = __frcp_rn(0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
+            float c15 = 1.0f / (0.25f*(1.0f/c15_1 + 1.0f/c15_2 + 1.0f/c15_3 + 1.0f/c15_4));
+            float c25 = 1.0f / (0.25f*(1.0f/c25_1 + 1.0f/c25_2 + 1.0f/c25_3 + 1.0f/c25_4));
+            float c35 = 1.0f / (0.25f*(1.0f/c35_1 + 1.0f/c35_2 + 1.0f/c35_3 + 1.0f/c35_4));
+            float c45 = 1.0f / (0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
+            float c55 = 1.0f / (0.25f*(1.0f/c55_1 + 1.0f/c55_2 + 1.0f/c55_3 + 1.0f/c55_4));
+            float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
 
             Txz[index] += dt*(c15*dVx_dx + c56*dVx_dy + c55*dVx_dz +
                               c56*dVy_dx + c25*dVy_dy + c45*dVy_dz +
@@ -1103,12 +1103,12 @@ __global__ void float_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             c46_3 = C46[(i+1) + j*nzz + k*nxx*nzz];
             c46_4 = C46[i + j*nzz + k*nxx*nzz];
 
-            float c14 = __frcp_rn(0.25f*(1.0f/c14_1 + 1.0f/c14_2 + 1.0f/c14_3 + 1.0f/c14_4));
-            float c24 = __frcp_rn(0.25f*(1.0f/c24_1 + 1.0f/c24_2 + 1.0f/c24_3 + 1.0f/c24_4));
-            float c34 = __frcp_rn(0.25f*(1.0f/c34_1 + 1.0f/c34_2 + 1.0f/c34_3 + 1.0f/c34_4));
-            float c44 = __frcp_rn(0.25f*(1.0f/c44_1 + 1.0f/c44_2 + 1.0f/c44_3 + 1.0f/c44_4));
-            float c45 = __frcp_rn(0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
-            float c46 = __frcp_rn(0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
+            float c14 = 1.0f / (0.25f*(1.0f/c14_1 + 1.0f/c14_2 + 1.0f/c14_3 + 1.0f/c14_4));
+            float c24 = 1.0f / (0.25f*(1.0f/c24_1 + 1.0f/c24_2 + 1.0f/c24_3 + 1.0f/c24_4));
+            float c34 = 1.0f / (0.25f*(1.0f/c34_1 + 1.0f/c34_2 + 1.0f/c34_3 + 1.0f/c34_4));
+            float c44 = 1.0f / (0.25f*(1.0f/c44_1 + 1.0f/c44_2 + 1.0f/c44_3 + 1.0f/c44_4));
+            float c45 = 1.0f / (0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
+            float c46 = 1.0f / (0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
 
             Tyz[index] += dt*(c14*dVx_dx + c46*dVx_dy + c45*dVx_dz +
                               c46*dVy_dx + c24*dVy_dy + c44*dVy_dz +
