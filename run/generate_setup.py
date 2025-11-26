@@ -1,7 +1,7 @@
 import numpy as np
 
-nx = 301
-ny = 301
+nx = 101
+ny = 101
 nz = 51
 
 dx = 10.0
@@ -13,15 +13,15 @@ dz = 10.0
 nsx = 1
 nsy = 1
 
-nrx = 117 
-nry = 4
+nrx = 91
+nry = 1
 
 ns = nsx*nsy
 nr = nrx*nry
 
-sx, sy = 500, 2500 
-rx, ry = np.meshgrid(np.linspace(50, 2950, nrx), 
-                     np.linspace(50, 2950, nry))
+sx, sy = 500, 500 
+rx, ry = np.meshgrid(np.linspace(50, 950, nrx), 
+                     np.linspace(50, 950, nry))
 
 SPS = np.zeros((ns, 3), dtype = float)
 RPS = np.zeros((nr, 3), dtype = float)

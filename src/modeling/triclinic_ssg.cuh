@@ -5,7 +5,9 @@
 
 class Triclinic_SSG : public Triclinic
 {    
-    void initialization();
+    void set_modeling_type();
+    void set_geometry_weights();
+
     void compute_velocity();
     void compute_pressure();
 };

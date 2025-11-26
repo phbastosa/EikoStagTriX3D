@@ -1,87 +1,60 @@
 # include "triclinic_ssg.cuh"
 
-void Triclinic_SSG::initialization()
+void Triclinic_SSG::set_modeling_type()
 {
     modeling_name = "Triclinic media with Standard Staggered Grid";
     modeling_type = "triclinic_ssg";
+}
 
-    float * h_skw = new float[DGS*DGS*DGS]();
-
-    auto skw = kaiser_weights(sx, sy, sz, sIdx, sIdy, sIdz, dx, dy, dz);
-
-    for (int yId = 0; yId < DGS; yId++)
-        for (int xId = 0; xId < DGS; xId++)
-            for (int zId = 0; zId < DGS; zId++)
-                h_skw[zId + xId*DGS + yId*DGS*DGS] = skw[zId][xId][yId];
-
-    sIdx += nb; 
-    sIdy += nb; 
-    sIdz += nb;
-
-    int * h_rIdx = new int[max_spread]();
-    int * h_rIdy = new int[max_spread]();
-    int * h_rIdz = new int[max_spread]();
-
-    float * h_rkwPs = new float[DGS*DGS*DGS*max_spread]();
-    float * h_rkwVx = new float[DGS*DGS*DGS*max_spread]();
-    float * h_rkwVy = new float[DGS*DGS*DGS*max_spread]();
-    float * h_rkwVz = new float[DGS*DGS*DGS*max_spread]();
-
-    int spreadId = 0;
-
-    for (recId = geometry->iRec[srcId]; recId < geometry->fRec[srcId]; recId++)
+void Triclinic_SSG::set_geometry_weights()
+{
+    for (srcId = 0; srcId < geometry->nsrc; srcId++)
     {
-        float rx = geometry->xrec[recId];
-        float ry = geometry->yrec[recId];
-        float rz = geometry->zrec[recId];
-        
-        int rIdx = (int)((rx + 0.5f*dx) / dx);
-        int rIdy = (int)((ry + 0.5f*dy) / dy);
-        int rIdz = (int)((rz + 0.5f*dz) / dz);
-    
+        sx = geometry->xsrc[srcId];
+        sy = geometry->ysrc[srcId];
+        sz = geometry->zsrc[srcId];
+
+        sIdx = (int)((sx + 0.5f*dx) / dx);
+        sIdy = (int)((sy + 0.5f*dy) / dy);
+        sIdz = (int)((sz + 0.5f*dz) / dz);
+
+        auto skw = kaiser_weights(sx, sy, sz, sIdx, sIdy, sIdz, dx, dy, dz);
+
+        for (int yId = 0; yId < DGS; yId++)
+            for (int xId = 0; xId < DGS; xId++)
+                for (int zId = 0; zId < DGS; zId++)
+                    h_skw[zId + xId*DGS + yId*DGS*DGS + srcId*DGS*DGS*DGS] = skw[zId][xId][yId];
+    }
+
+    for (recId = 0; recId < geometry->nrec; recId++)
+    {
+        rx = geometry->xrec[recId];
+        ry = geometry->yrec[recId];
+        rz = geometry->zrec[recId];
+
+        rIdx = (int)((rx + 0.5f*dx) / dx);
+        rIdy = (int)((ry + 0.5f*dy) / dy);
+        rIdz = (int)((rz + 0.5f*dz) / dz);
+
         auto rkwPs = kaiser_weights(rx, ry, rz, rIdx, rIdy, rIdz, dx, dy, dz);
         auto rkwVx = kaiser_weights(rx + 0.5f*dx, ry, rz, rIdx, rIdy, rIdz, dx, dy, dz);
         auto rkwVy = kaiser_weights(rx, ry + 0.5f*dy, rz, rIdx, rIdy, rIdz, dx, dy, dz);
         auto rkwVz = kaiser_weights(rx, ry, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz);
-        
+
         for (int zId = 0; zId < DGS; zId++)
         {
             for (int xId = 0; xId < DGS; xId++)
             {
                 for (int yId = 0; yId < DGS; yId++)
                 {
-                    h_rkwPs[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwPs[zId][xId][yId];
-                    h_rkwVx[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVx[zId][xId][yId];
-                    h_rkwVy[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVy[zId][xId][yId];
-                    h_rkwVz[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVz[zId][xId][yId];
+                    h_rkwPs[zId + xId*DGS + yId*DGS*DGS + recId*DGS*DGS*DGS] = rkwPs[zId][xId][yId];
+                    h_rkwVx[zId + xId*DGS + yId*DGS*DGS + recId*DGS*DGS*DGS] = rkwVx[zId][xId][yId];
+                    h_rkwVy[zId + xId*DGS + yId*DGS*DGS + recId*DGS*DGS*DGS] = rkwVy[zId][xId][yId];
+                    h_rkwVz[zId + xId*DGS + yId*DGS*DGS + recId*DGS*DGS*DGS] = rkwVz[zId][xId][yId];
                 }
             }
         }
-
-        h_rIdx[spreadId] = rIdx + nb;
-        h_rIdy[spreadId] = rIdy + nb;
-        h_rIdz[spreadId] = rIdz + nb;
-
-        ++spreadId;
     }
-
-    cudaMemcpy(d_skw, h_skw, DGS*DGS*DGS*sizeof(float), cudaMemcpyHostToDevice);
-
-    cudaMemcpy(d_rkwPs, h_rkwPs, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_rkwVx, h_rkwVx, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_rkwVy, h_rkwVy, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_rkwVz, h_rkwVz, DGS*DGS*DGS*max_spread*sizeof(float), cudaMemcpyHostToDevice);
-
-    cudaMemcpy(d_rIdx, h_rIdx, max_spread*sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_rIdy, h_rIdy, max_spread*sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_rIdz, h_rIdz, max_spread*sizeof(int), cudaMemcpyHostToDevice);
-
-    delete[] h_skw;
-    delete[] h_rkwPs;
-    delete[] h_rkwVx;
-    delete[] h_rkwVz;
-    delete[] h_rIdx;
-    delete[] h_rIdz;
 }
 
 void Triclinic_SSG::compute_velocity()
@@ -135,28 +108,6 @@ __global__ void uintc_compute_velocity_ssg(float * Vx, float * Vy, float * Vz, f
 
     float Bn, Bm;
 
-    if ((index == 0) && (tId < nt))
-    {   
-        for (int k = 0; k < DGS; k++)
-        {
-            int yi = sIdy + k - 3;
-            
-            for (int j = 0; j < DGS; j++)
-            {
-                int xi = sIdx + j - 3;
-    
-                for (int i = 0; i < DGS; i++)
-                {
-                    int zi = sIdz + i - 3;
-            
-                    Txx[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
-                    Tyy[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
-                    Tzz[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);           
-                }
-            }
-        }
-    }
-    
     T[index] = (eikonal) ? T[index] : 0.0f;
 
     if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
