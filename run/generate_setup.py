@@ -27,7 +27,6 @@ rx, ry = np.meshgrid(np.linspace(50, 950, nrx),
 
 SPS = np.zeros((ns, 3), dtype = float)
 RPS = np.zeros((nr, 3), dtype = float)
-XPS = np.zeros((ns, 3), dtype = int)
 
 SPS[:,0] = np.reshape(sx, [ns], order = "F")
 SPS[:,1] = np.reshape(sy, [ns], order = "F")
@@ -37,17 +36,11 @@ RPS[:,0] = np.reshape(rx, [nr], order = "C")
 RPS[:,1] = np.reshape(ry, [nr], order = "C")
 RPS[:,2] = np.zeros(nr)
 
-XPS[:, 0] = np.arange(ns)
-XPS[:, 1] = np.zeros(ns) 
-XPS[:, 2] = np.zeros(ns) + nr 
-
 path_SPS = "../inputs/geometry/EikoStagTriX3D_SPS.txt"
 path_RPS = "../inputs/geometry/EikoStagTriX3D_RPS.txt"
-path_XPS = "../inputs/geometry/EikoStagTriX3D_XPS.txt"
 
 np.savetxt(path_SPS, SPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_RPS, RPS, fmt = "%.2f", delimiter = ",")
-np.savetxt(path_XPS, XPS, fmt = "%.0f", delimiter = ",")
 
 vp = np.array([1500,1600,1800,2000,2500])
 vs = np.array([   0, 950,1060,1180,1470])
