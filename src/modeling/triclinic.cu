@@ -1113,9 +1113,9 @@ __global__ void apply_pressure_source(float * Txx, float * Tyy, float * Tzz, flo
     int j = threadIdx.y + blockIdx.y * blockDim.y;
     int k = threadIdx.z + blockIdx.z * blockDim.z;
 
-    int yi = sIdy + (k - 3);
-    int xi = sIdx + (j - 3);
     int zi = sIdz + (i - 3);
+    int xi = sIdx + (j - 3);
+    int yi = sIdy + (k - 3);
 
     int index = zi + xi*nzz + yi*nxx*nzz;
         

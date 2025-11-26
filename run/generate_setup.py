@@ -10,8 +10,8 @@ dz = 10.0
 
 # Acquisition geometry
 
-nsx = 1
-nsy = 1
+nsx = 2
+nsy = 2
 
 nrx = 91
 nry = 1
@@ -19,7 +19,9 @@ nry = 1
 ns = nsx*nsy
 nr = nrx*nry
 
-sx, sy = 500, 500 
+sx, sy = np.meshgrid(np.linspace(300, 700, nsx), 
+                     np.linspace(300, 700, nsy))
+
 rx, ry = np.meshgrid(np.linspace(50, 950, nrx), 
                      np.linspace(50, 950, nry))
 
@@ -46,8 +48,6 @@ path_XPS = "../inputs/geometry/EikoStagTriX3D_XPS.txt"
 np.savetxt(path_SPS, SPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_RPS, RPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_XPS, XPS, fmt = "%.0f", delimiter = ",")
-
-offset = np.sqrt((SPS[0,0] - RPS[:,0])**2 + (SPS[0,1] - RPS[:,1])**2)
 
 vp = np.array([1500,1600,1800,2000,2500])
 vs = np.array([   0, 950,1060,1180,1470])
