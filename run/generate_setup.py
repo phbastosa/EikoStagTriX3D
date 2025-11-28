@@ -1,29 +1,29 @@
 import numpy as np
 
-nx = 101
-ny = 101
-nz = 51
+nx = 201
+ny = 201
+nz = 81
 
-dx = 10.0
-dy = 10.0
-dz = 10.0
+dx = 25.0
+dy = 25.0
+dz = 25.0
 
 # Acquisition geometry
 
-nsx = 2
-nsy = 2
+nsx = 1
+nsy = 1
 
-nrx = 91
-nry = 1
+nrx = 201
+nry = 201
 
 ns = nsx*nsy
 nr = nrx*nry
 
-sx, sy = np.meshgrid(np.linspace(300, 700, nsx), 
-                     np.linspace(300, 700, nsy))
+sx, sy = np.meshgrid(np.linspace(1000, 4000, nsx), 
+                     np.linspace(1000, 4000, nsy))
 
-rx, ry = np.meshgrid(np.linspace(50, 950, nrx), 
-                     np.linspace(50, 950, nry))
+rx, ry = np.meshgrid(np.linspace(0, 5000, nrx), 
+                     np.linspace(0, 5000, nry))
 
 SPS = np.zeros((ns, 3), dtype = float)
 RPS = np.zeros((nr, 3), dtype = float)
@@ -42,21 +42,21 @@ path_RPS = "../inputs/geometry/EikoStagTriX3D_RPS.txt"
 np.savetxt(path_SPS, SPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_RPS, RPS, fmt = "%.2f", delimiter = ",")
 
-vp = np.array([1500,1600,1800,2000,2500])
-vs = np.array([   0, 950,1060,1180,1470])
-ro = np.array([1000,2350,2400,2450,2500])
-z = np.array([200, 50, 100, 100])
+vp = np.array([1500,1600,1800,2000])
+vs = np.array([   0, 950,1060,1180])
+ro = np.array([1000,2350,2400,2450])
+z = np.array([750, 500, 500])
 
-E1 = np.array([0.0, 0.05, 0.10, 0.12, 0.0])
-E2 = np.array([0.0, 0.07, 0.08, 0.10, 0.0])
-D1 = np.array([0.0, 0.03, 0.05, 0.06, 0.0])
-D2 = np.array([0.0, 0.02, 0.03, 0.05, 0.0])
-D3 = np.array([0.0, 0.01, 0.02, 0.03, 0.0])
-G1 = np.array([0.0, 0.05, 0.02, 0.01, 0.0])
-G2 = np.array([0.0, 0.10, 0.08, 0.06, 0.0])
+E1 = np.array([0.0, 0.0, 0.10, 0.0])
+E2 = np.array([0.0, 0.0, 0.00, 0.0])
+D1 = np.array([0.0, 0.0, 0.05, 0.0])
+D2 = np.array([0.0, 0.0, 0.00, 0.0])
+D3 = np.array([0.0, 0.0, 0.00, 0.0])
+G1 = np.array([0.0, 0.0, 0.00, 0.0])
+G2 = np.array([0.0, 0.0, 0.00, 0.0])
 
-tilt = np.array([0, 10, 15, 20, 0]) * np.pi/180.0
-azmt = np.array([0,  5, 10, 30, 0]) * np.pi/180.0
+tilt = np.array([0, 0, 30.0, 0]) * np.pi/180.0
+azmt = np.array([0, 0, 0.00, 0]) * np.pi/180.0
 
 S = np.zeros((nz, nx, ny))
 B = np.zeros((nz, nx, ny))

@@ -53,11 +53,10 @@ private:
     void set_seismogram();
     void set_wavefields();
 
-    void initialization();
     void eikonal_solver();
-    void source_injection();
     void time_propagation();
     void wavefield_refresh();
+    void get_shot_position();
 
     void compute_eikonal();
     void compute_snapshots();
@@ -65,6 +64,7 @@ private:
     void export_seismograms();
     void export_travelTimes();
 
+    void source_injection();
     void show_information();
     void show_time_progress();
 
@@ -73,9 +73,6 @@ private:
     
     void get_compression(float * input, uintc * output, int N, float &max_value, float &min_value);
 
-    void set_uintc_element(std::string element_path, uintc *&dCij, float &max, float &min);
-    void set_float_element(std::string element_path, float *&dCij);
-
     int iDivUp(int a, int b);
 
 protected:
@@ -83,16 +80,14 @@ protected:
     float dx, dy, dz, dt;
     int nxx, nyy, nzz, volsize;
     int nt, nx, ny, nz, nb, nPoints;
-    int srcId, sIdx, sIdy, sIdz;
-    int recId, rIdx, rIdy, rIdz;
+    int srcId, recId, sIdx, sIdy, sIdz;
     int tlag, nsnap, isnap, fsnap;
-    int timeId, nBlocks;
+    int timeId, sBlocks, nBlocks;
 
     float bd, fmax;
 
     int total_levels;    
-    float sx, sy, sz;
-    float rx, ry, rz;    
+    float sx, sy, sz;    
     float dz2i, dx2i, dy2i, dsum;
     float dz2dx2, dz2dy2, dx2dy2;
 
@@ -102,17 +97,15 @@ protected:
     int * d_sgnv = nullptr;
     int * d_sgnt = nullptr;
 
-    float * h_skw = nullptr;
-    float * h_rkwPs = nullptr;
-    float * h_rkwVx = nullptr;
-    float * h_rkwVy = nullptr;
-    float * h_rkwVz = nullptr;
-
     float * d_skw = nullptr;
     float * d_rkwPs = nullptr;
     float * d_rkwVx = nullptr;
     float * d_rkwVy = nullptr;
     float * d_rkwVz = nullptr;
+
+    int * d_rIdx = nullptr;
+    int * d_rIdy = nullptr;
+    int * d_rIdz = nullptr;
 
     float * d_wavelet = nullptr;
 
@@ -174,8 +167,10 @@ protected:
 
     float * d_C66 = nullptr; uintc * dc_C66 = nullptr; float maxC66; float minC66;
 
+    virtual void set_rec_weights() = 0;
+    virtual void set_src_weights() = 0;
+
     virtual void set_modeling_type() = 0;
-    virtual void set_geometry_weights() = 0;
 
     virtual void compute_velocity() = 0;
     virtual void compute_pressure() = 0;
@@ -214,7 +209,7 @@ __global__ void uintc_quasi_slowness(float * T, float * S, float dx, float dy, f
 
 __global__ void apply_pressure_source(float * Txx, float * Tyy, float * Tzz, float * skw, float * wavelet, int sIdx, int sIdy, int sIdz, int tId, int nxx, int nzz, float dx, float dy, float dz);
 
-__global__ void compute_seismogram_GPU(float * WF, float * seismogram, float * rkw, int rIdx, int rIdy, int rIdz, int tId, int tlag, int recId, int nt, int nxx, int nzz);
+__global__ void compute_seismogram_GPU(float * WF, int * rIdx, int * rIdy, int * rIdz, float * rkw, float * seismogram, int spread, int tId, int tlag, int nt, int nxx, int nzz);
 
 __device__ float get_boundary_damper(float * damp1D, float * damp2D, float * damp3D, int i, int j, int k, int nxx, int nyy, int nzz, int nabc);
 

@@ -4,9 +4,11 @@
 # include "triclinic.cuh"
 
 class Triclinic_SSG : public Triclinic
-{    
+{        
+    void set_rec_weights();
+    void set_src_weights();
+
     void set_modeling_type();
-    void set_geometry_weights();
 
     void compute_velocity();
     void compute_pressure();
