@@ -1,12 +1,12 @@
-# include "triclinic_ssg.cuh"
+# include "triclinic_issg.cuh"
 
-void Triclinic_SSG::set_modeling_type()
+void Triclinic_iSSG::set_modeling_type()
 {
-    modeling_name = "Triclinic media with Standard Staggered Grid";
-    modeling_type = "triclinic_ssg";
+    modeling_name = "Triclinic media with interpolated Standard Staggered Grid";
+    modeling_type = "triclinic_issg";
 }
 
-void Triclinic_SSG::set_rec_weights()
+void Triclinic_iSSG::set_rec_weights()
 {
     int * h_rIdx = new int[geometry->nrec]();
     int * h_rIdy = new int[geometry->nrec]();
@@ -69,7 +69,7 @@ void Triclinic_SSG::set_rec_weights()
     delete[] h_rIdz;
 }
 
-void Triclinic_SSG::set_src_weights()
+void Triclinic_iSSG::set_src_weights()
 {
     float * h_skw = new float[DGS*DGS*DGS]();
 
@@ -85,48 +85,48 @@ void Triclinic_SSG::set_src_weights()
     delete[] h_skw;
 }
 
-void Triclinic_SSG::compute_velocity()
+void Triclinic_iSSG::compute_velocity()
 {
     if (compression)
     {
-        uintc_compute_velocity_ssg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,dc_B,
-                                                         maxB,minB,d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx, 
-                                                         sIdy,sIdz,d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
+        uintc_compute_velocity_issg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,dc_B,
+                                                          maxB,minB,d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx, 
+                                                          sIdy,sIdz,d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
     }
     else 
     {
-        float_compute_velocity_ssg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,d_B,
-                                                         d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx,sIdy,sIdz,
-                                                         d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
+        float_compute_velocity_issg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,d_B,
+                                                          d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx,sIdy,sIdz,
+                                                          d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
     }
 }
 
-void Triclinic_SSG::compute_pressure()
+void Triclinic_iSSG::compute_pressure()
 {
     if (compression)
     {
-        uintc_compute_pressure_ssg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
-                                                         dc_C11,dc_C12,dc_C13,dc_C14,dc_C15,dc_C16,dc_C22,dc_C23,dc_C24,
-                                                         dc_C25,dc_C26,dc_C33,dc_C34,dc_C35,dc_C36,dc_C44,dc_C45,dc_C46,
-                                                         dc_C55,dc_C56,dc_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,minC11, 
-                                                         maxC11,minC12,maxC12,minC13,maxC13,minC14,maxC14,minC15,maxC15,
-                                                         minC16,maxC16,minC22,maxC22,minC23,maxC23,minC24,maxC24,minC25,
-                                                         maxC25,minC26,maxC26,minC33,maxC33,minC34,maxC34,minC35,maxC35, 
-                                                         minC36,maxC36,minC44,maxC44,minC45,maxC45,minC46,maxC46,minC55, 
-                                                         maxC55,minC56,maxC56,minC66,maxC66,eikonalClip);
+        uintc_compute_pressure_issg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
+                                                          dc_C11,dc_C12,dc_C13,dc_C14,dc_C15,dc_C16,dc_C22,dc_C23,dc_C24,
+                                                          dc_C25,dc_C26,dc_C33,dc_C34,dc_C35,dc_C36,dc_C44,dc_C45,dc_C46,
+                                                          dc_C55,dc_C56,dc_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,minC11, 
+                                                          maxC11,minC12,maxC12,minC13,maxC13,minC14,maxC14,minC15,maxC15,
+                                                          minC16,maxC16,minC22,maxC22,minC23,maxC23,minC24,maxC24,minC25,
+                                                          maxC25,minC26,maxC26,minC33,maxC33,minC34,maxC34,minC35,maxC35, 
+                                                          minC36,maxC36,minC44,maxC44,minC45,maxC45,minC46,maxC46,minC55, 
+                                                          maxC55,minC56,maxC56,minC66,maxC66,eikonalClip);
     }
     else 
     {
-        float_compute_pressure_ssg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
-                                                         d_C11,d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,d_C23,d_C24,d_C25,
-                                                         d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55,d_C56, 
-                                                         d_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,eikonalClip);
+        float_compute_pressure_issg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
+                                                          d_C11,d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,d_C23,d_C24,d_C25,
+                                                          d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55,d_C56, 
+                                                          d_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,eikonalClip);
     }
 }
 
-__global__ void uintc_compute_velocity_ssg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, uintc * B,
-                                           float maxB, float minB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, 
-                                           int tlag, int sIdx, int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt, bool eikonal)
+__global__ void uintc_compute_velocity_issg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, uintc * B,
+                                            float maxB, float minB, float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, 
+                                            int tlag, int sIdx, int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt, bool eikonal)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -229,9 +229,9 @@ __global__ void uintc_compute_velocity_ssg(float * Vx, float * Vy, float * Vz, f
     }
 }
 
-__global__ void float_compute_velocity_ssg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, float * B,
-                                           float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, int tlag, int sIdx, 
-                                           int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt, bool eikonal)
+__global__ void float_compute_velocity_issg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * T, float * B,
+                                            float * damp1D, float * damp2D, float * damp3D, float * wavelet, float dx, float dy, float dz, float dt, int tId, int tlag, int sIdx, 
+                                            int sIdy, int sIdz, float * skw, int nxx, int nyy, int nzz, int nb, int nt, bool eikonal)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -324,14 +324,14 @@ __global__ void float_compute_velocity_ssg(float * Vx, float * Vy, float * Vz, f
     }
 }
 
-__global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * P, float * T, 
-                                           uintc * C11, uintc * C12, uintc * C13, uintc * C14, uintc * C15, uintc * C16, uintc * C22, uintc * C23, uintc * C24, uintc * C25, uintc * C26, 
-                                           uintc * C33, uintc * C34, uintc * C35, uintc * C36, uintc * C44, uintc * C45, uintc * C46, uintc * C55, uintc * C56, uintc * C66, int tId, 
-                                           int tlag, float dx, float dy, float dz, float dt, int nxx, int nyy, int nzz, float minC11, float maxC11, float minC12, float maxC12, 
-                                           float minC13, float maxC13, float minC14, float maxC14, float minC15, float maxC15, float minC16, float maxC16, float minC22, float maxC22, 
-                                           float minC23, float maxC23, float minC24, float maxC24, float minC25, float maxC25, float minC26, float maxC26, float minC33, float maxC33, 
-                                           float minC34, float maxC34, float minC35, float maxC35, float minC36, float maxC36, float minC44, float maxC44, float minC45, float maxC45, 
-                                           float minC46, float maxC46, float minC55, float maxC55, float minC56, float maxC56, float minC66, float maxC66, bool eikonal)
+__global__ void uintc_compute_pressure_issg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * P, float * T, 
+                                            uintc * C11, uintc * C12, uintc * C13, uintc * C14, uintc * C15, uintc * C16, uintc * C22, uintc * C23, uintc * C24, uintc * C25, uintc * C26, 
+                                            uintc * C33, uintc * C34, uintc * C35, uintc * C36, uintc * C44, uintc * C45, uintc * C46, uintc * C55, uintc * C56, uintc * C66, int tId, 
+                                            int tlag, float dx, float dy, float dz, float dt, int nxx, int nyy, int nzz, float minC11, float maxC11, float minC12, float maxC12, 
+                                            float minC13, float maxC13, float minC14, float maxC14, float minC15, float maxC15, float minC16, float maxC16, float minC22, float maxC22, 
+                                            float minC23, float maxC23, float minC24, float maxC24, float minC25, float maxC25, float minC26, float maxC26, float minC33, float maxC33, 
+                                            float minC34, float maxC34, float minC35, float maxC35, float minC36, float maxC36, float minC44, float maxC44, float minC45, float maxC45, 
+                                            float minC46, float maxC46, float minC55, float maxC55, float minC56, float maxC56, float minC66, float maxC66, bool eikonal)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -362,51 +362,101 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
     if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
     {
         if((i > 3) && (i < nzz-3) && (j > 3) && (j < nxx-3) && (k > 3) && (k < nyy-3)) 
-        {    
+        {               
+            // dVx_dx ---------------------------------------------------------------------
+
             float dVx_dx = (FDM1*(Vx[i + (j-4)*nzz + k*nxx*nzz] - Vx[i + (j+3)*nzz + k*nxx*nzz]) +
                             FDM2*(Vx[i + (j+2)*nzz + k*nxx*nzz] - Vx[i + (j-3)*nzz + k*nxx*nzz]) +
                             FDM3*(Vx[i + (j-2)*nzz + k*nxx*nzz] - Vx[i + (j+1)*nzz + k*nxx*nzz]) +
                             FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+ 
+            // dVx_dy ---------------------------------------------------------------------
 
-            float dVy_dx = (FDM1*(Vy[i + (j-4)*nzz + k*nxx*nzz] - Vy[i + (j+3)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[i + (j+2)*nzz + k*nxx*nzz] - Vy[i + (j-3)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[i + (j-2)*nzz + k*nxx*nzz] - Vy[i + (j+1)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+            float dVx_dy1 = (1.0f*(Vx[i + j*nzz + (k+3)*nxx*nzz] - Vx[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vx[i + j*nzz + (k-2)*nxx*nzz] - Vx[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vx[i + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy); 
+            
+            float dVx_dy2 = (1.0f*(Vx[i + (j-1)*nzz + (k+3)*nxx*nzz] - Vx[i + (j-1)*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vx[i + (j-1)*nzz + (k-2)*nxx*nzz] - Vx[i + (j-1)*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vx[i + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[i + (j-1)*nzz + (k-1)*nxx*nzz])) / (60.0f*dy); 
+            
+            float dVx_dy = 0.5f*(dVx_dy1 + dVx_dy2);
 
-            float dVz_dx = (FDM1*(Vz[i + (j-4)*nzz + k*nxx*nzz] - Vz[i + (j+3)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[i + (j+2)*nzz + k*nxx*nzz] - Vz[i + (j-3)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[i + (j-2)*nzz + k*nxx*nzz] - Vz[i + (j+1)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+            // dVx_dz ---------------------------------------------------------------------
 
-            float dVx_dy = (FDM1*(Vx[i + j*nzz + (k-4)*nxx*nzz] - Vx[i + j*nzz + (k+3)*nxx*nzz]) +
-                            FDM2*(Vx[i + j*nzz + (k+2)*nxx*nzz] - Vx[i + j*nzz + (k-3)*nxx*nzz]) +
-                            FDM3*(Vx[i + j*nzz + (k-2)*nxx*nzz] - Vx[i + j*nzz + (k+1)*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+            float dVx_dz1 = (1.0f*(Vx[(i+3) + j*nzz + k*nxx*nzz] - Vx[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[(i-2) + j*nzz + k*nxx*nzz] - Vx[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + j*nzz + k*nxx*nzz] - Vx[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz); 
+            
+            float dVx_dz2 = (1.0f*(Vx[(i+3) + (j-1)*nzz + k*nxx*nzz] - Vx[(i-3) + (j-1)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[(i-2) + (j-1)*nzz + k*nxx*nzz] - Vx[(i+2) + (j-1)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + (j-1)*nzz + k*nxx*nzz] - Vx[(i-1) + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dz); 
+            
+            float dVx_dz = 0.5f*(dVx_dz1 + dVx_dz2);
+
+            // dVy_dx ---------------------------------------------------------------------
+
+            float dVy_dx1 = (1.0f*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vy[i + (j-2)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx); 
+            
+            float dVy_dx2 = (1.0f*(Vy[i + (j+3)*nzz + (k-1)*nxx*nzz] - Vy[i + (j-3)*nzz + (k-1)*nxx*nzz]) +
+                             9.0f*(Vy[i + (j-2)*nzz + (k-1)*nxx*nzz] - Vy[i + (j+2)*nzz + (k-1)*nxx*nzz]) +
+                            45.0f*(Vy[i + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[i + (j-1)*nzz + (k-1)*nxx*nzz])) / (60.0f*dx); 
+            
+            float dVy_dx = 0.5f*(dVy_dx1 + dVy_dx2);
+
+            // dVy_dy ---------------------------------------------------------------------
 
             float dVy_dy = (FDM1*(Vy[i + j*nzz + (k-4)*nxx*nzz] - Vy[i + j*nzz + (k+3)*nxx*nzz]) +
                             FDM2*(Vy[i + j*nzz + (k+2)*nxx*nzz] - Vy[i + j*nzz + (k-3)*nxx*nzz]) +
                             FDM3*(Vy[i + j*nzz + (k-2)*nxx*nzz] - Vy[i + j*nzz + (k+1)*nxx*nzz]) +
                             FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[i + j*nzz + (k-1)*nxx*nzz])) / dy;
 
-            float dVz_dy = (FDM1*(Vz[i + j*nzz + (k-4)*nxx*nzz] - Vz[i + j*nzz + (k+3)*nxx*nzz]) +
-                            FDM2*(Vz[i + j*nzz + (k+2)*nxx*nzz] - Vz[i + j*nzz + (k-3)*nxx*nzz]) +
-                            FDM3*(Vz[i + j*nzz + (k-2)*nxx*nzz] - Vz[i + j*nzz + (k+1)*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+            // dVy_dz ---------------------------------------------------------------------
 
-            float dVx_dz = (FDM1*(Vx[(i-4) + j*nzz + k*nxx*nzz] - Vx[(i+3) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[(i+2) + j*nzz + k*nxx*nzz] - Vx[(i-3) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[(i-2) + j*nzz + k*nxx*nzz] - Vx[(i+1) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+            float dVy_dz1 = (1.0f*(Vy[(i+3) + j*nzz + k*nxx*nzz] - Vy[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vy[(i-2) + j*nzz + k*nxx*nzz] - Vy[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + j*nzz + k*nxx*nzz] - Vy[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz); 
+            
+            float dVy_dz2 = (1.0f*(Vy[(i+3) + j*nzz + (k-1)*nxx*nzz] - Vy[(i-3) + j*nzz + (k-1)*nxx*nzz]) +
+                             9.0f*(Vy[(i-2) + j*nzz + (k-1)*nxx*nzz] - Vy[(i+2) + j*nzz + (k-1)*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + j*nzz + (k-1)*nxx*nzz] - Vy[(i-1) + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dz); 
 
-            float dVy_dz = (FDM1*(Vy[(i-4) + j*nzz + k*nxx*nzz] - Vy[(i+3) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[(i+2) + j*nzz + k*nxx*nzz] - Vy[(i-3) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[(i-2) + j*nzz + k*nxx*nzz] - Vy[(i+1) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+            float dVy_dz = 0.5f*(dVy_dz1 + dVy_dz2);
+
+            // dVz_dx ---------------------------------------------------------------------
+
+            float dVz_dx1 = (1.0f*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[i + (j-2)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx); 
+            
+            float dVz_dx2 = (1.0f*(Vz[(i-1) + (j+3)*nzz + k*nxx*nzz] - Vz[(i-1) + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[(i-1) + (j-2)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[(i-1) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-1) + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx); 
+
+            float dVz_dx = 0.5f*(dVz_dx1 + dVz_dx2);
+
+            // dVz_dy ---------------------------------------------------------------------
+
+            float dVz_dy1 = (1.0f*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vz[i + j*nzz + (k-2)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy); 
+            
+            float dVz_dy2 = (1.0f*(Vz[(i-1) + j*nzz + (k+3)*nxx*nzz] - Vz[(i-1) + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vz[(i-1) + j*nzz + (k-2)*nxx*nzz] - Vz[(i-1) + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vz[(i-1) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy); 
+
+            float dVz_dy = 0.5f*(dVz_dy1 + dVz_dy2);
+
+            // dVz_dz ---------------------------------------------------------------------
 
             float dVz_dz = (FDM1*(Vz[(i-4) + j*nzz + k*nxx*nzz] - Vz[(i+3) + j*nzz + k*nxx*nzz]) +
                             FDM2*(Vz[(i+2) + j*nzz + k*nxx*nzz] - Vz[(i-3) + j*nzz + k*nxx*nzz]) +
                             FDM3*(Vz[(i-2) + j*nzz + k*nxx*nzz] - Vz[(i+1) + j*nzz + k*nxx*nzz]) +
                             FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+
+            // Constants ---------------------------------------------------------------------
             
             float c11 = (minC11 + (static_cast<float>(C11[index]) - 1.0f) * (maxC11 - minC11) / (COMPRESS - 1));
             float c12 = (minC12 + (static_cast<float>(C12[index]) - 1.0f) * (maxC12 - minC12) / (COMPRESS - 1));
@@ -426,6 +476,8 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             float c35 = (minC35 + (static_cast<float>(C35[index]) - 1.0f) * (maxC35 - minC35) / (COMPRESS - 1));
             float c36 = (minC36 + (static_cast<float>(C36[index]) - 1.0f) * (maxC36 - minC36) / (COMPRESS - 1));
 
+            // Equation ---------------------------------------------------------------------
+
             Txx[index] += dt*(c11*dVx_dx + c16*dVx_dy + c15*dVx_dz +
                               c16*dVy_dx + c12*dVy_dy + c14*dVy_dz +
                               c15*dVz_dx + c14*dVz_dy + c13*dVz_dz);                    
@@ -443,50 +495,141 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
 
         if((i > 3) && (i < nzz-3) && (j >= 3) && (j < nxx-4) && (k >= 3) && (k < nyy-4)) 
         {
-            float dVx_dx = (FDM1*(Vx[i + (j-3)*nzz + k*nxx*nzz] - Vx[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[i + (j+3)*nzz + k*nxx*nzz] - Vx[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[i + (j-1)*nzz + k*nxx*nzz] - Vx[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[i + (j+1)*nzz + k*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dx;
+            // dVx_dx ---------------------------------------------------------------------
 
-            float dVy_dx = (FDM1*(Vy[i + (j-3)*nzz + k*nxx*nzz] - Vy[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[i + (j-1)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx1 = (1.0f*(Vx[i + (j+3)*nzz + k*nxx*nzz] - Vx[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[i + (j-2)*nzz + k*nxx*nzz] - Vx[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[i + (j+1)*nzz + k*nxx*nzz] - Vx[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx);
+                            
+            float dVx_dx2 = (1.0f*(Vx[i + (j+3)*nzz + (k+1)*nxx*nzz] - Vx[i + (j-3)*nzz + (k+1)*nxx*nzz]) +
+                             9.0f*(Vx[i + (j-2)*nzz + (k+1)*nxx*nzz] - Vx[i + (j+2)*nzz + (k+1)*nxx*nzz]) +
+                            45.0f*(Vx[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vx[i + (j-1)*nzz + (k+1)*nxx*nzz])) / (60.0f*dx);
 
-            float dVz_dx = (FDM1*(Vz[i + (j-3)*nzz + k*nxx*nzz] - Vz[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[i + (j-1)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx = 0.5f*(dVx_dx1 + dVx_dx2);
+
+            // dVx_dy ---------------------------------------------------------------------
 
             float dVx_dy = (FDM1*(Vx[i + j*nzz + (k-3)*nxx*nzz] - Vx[i + j*nzz + (k+4)*nxx*nzz]) +
                             FDM2*(Vx[i + j*nzz + (k+3)*nxx*nzz] - Vx[i + j*nzz + (k-2)*nxx*nzz]) +
                             FDM3*(Vx[i + j*nzz + (k-1)*nxx*nzz] - Vx[i + j*nzz + (k+2)*nxx*nzz]) +
                             FDM4*(Vx[i + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dy;
 
-            float dVy_dy = (FDM1*(Vy[i + j*nzz + (k-3)*nxx*nzz] - Vy[i + j*nzz + (k+4)*nxx*nzz]) +
-                            FDM2*(Vy[i + j*nzz + (k+3)*nxx*nzz] - Vy[i + j*nzz + (k-2)*nxx*nzz]) +
-                            FDM3*(Vy[i + j*nzz + (k-1)*nxx*nzz] - Vy[i + j*nzz + (k+2)*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + (k+1)*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dy;
+            // dVx_dz ---------------------------------------------------------------------
 
-            float dVz_dy = (FDM1*(Vz[i + j*nzz + (k-3)*nxx*nzz] - Vz[i + j*nzz + (k+4)*nxx*nzz]) +
-                            FDM2*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-2)*nxx*nzz]) +
-                            FDM3*(Vz[i + j*nzz + (k-1)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dy;
+            float dVx_dz1 = (1.0f*(Vx[(i+3) + j*nzz + k*nxx*nzz] - Vx[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[(i-2) + j*nzz + k*nxx*nzz] - Vx[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + j*nzz + k*nxx*nzz] - Vx[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz);
 
-            float dVx_dz = (FDM1*(Vx[(i-4) + j*nzz + k*nxx*nzz] - Vx[(i+3) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[(i+2) + j*nzz + k*nxx*nzz] - Vx[(i-3) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[(i-2) + j*nzz + k*nxx*nzz] - Vx[(i+1) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+            float dVx_dz2 = (1.0f*(Vx[(i+3) + j*nzz + (k+1)*nxx*nzz] - Vx[(i-3) + j*nzz + (k+1)*nxx*nzz]) +
+                             9.0f*(Vx[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vx[(i+2) + j*nzz + (k+1)*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vx[(i-1) + j*nzz + (k+1)*nxx*nzz])) / (60.0f*dz);
 
-            float dVy_dz = (FDM1*(Vy[(i-4) + j*nzz + k*nxx*nzz] - Vy[(i+3) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[(i+2) + j*nzz + k*nxx*nzz] - Vy[(i-3) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[(i-2) + j*nzz + k*nxx*nzz] - Vy[(i+1) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+            float dVx_dz = 0.5f*(dVx_dz1 + dVx_dz2);
 
-            float dVz_dz = (FDM1*(Vz[(i-4) + j*nzz + k*nxx*nzz] - Vz[(i+3) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[(i+2) + j*nzz + k*nxx*nzz] - Vz[(i-3) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[(i-2) + j*nzz + k*nxx*nzz] - Vz[(i+1) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[(i-1) + j*nzz + k*nxx*nzz])) / dz;
+            // dVy_dx ---------------------------------------------------------------------
+
+            float dVy_dx = (FDM1*(Vy[i + (j-3)*nzz + k*nxx*nzz] - Vy[i + (j+4)*nzz + k*nxx*nzz]) +
+                            FDM2*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-2)*nzz + k*nxx*nzz]) +
+                            FDM3*(Vy[i + (j-1)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
+                            FDM4*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dx;
+
+            // dVy_dy ---------------------------------------------------------------------
+
+            float dVy_dy1 = (1.0f*(Vy[i + j*nzz + (k+3)*nxx*nzz] - Vy[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vy[i + j*nzz + (k-2)*nxx*nzz] - Vy[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vy[i + j*nzz + (k+1)*nxx*nzz] - Vy[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVy_dy2 = (1.0f*(Vy[i + (j+1)*nzz + (k+3)*nxx*nzz] - Vy[i + (j+1)*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vy[i + (j+1)*nzz + (k-2)*nxx*nzz] - Vy[i + (j+1)*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vy[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vy[i + (j+1)*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVy_dy = 0.5f*(dVy_dy1 + dVy_dy2);
+
+            // dVy_dz ---------------------------------------------------------------------
+
+            float dVy_dz1 = (1.0f*(Vy[(i+3) + j*nzz + k*nxx*nzz] - Vy[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vy[(i-2) + j*nzz + k*nxx*nzz] - Vy[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + j*nzz + k*nxx*nzz] - Vy[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz);
+
+            float dVy_dz2 = (1.0f*(Vy[(i+3) + j*nzz + (k+1)*nxx*nzz] - Vy[(i-3) + j*nzz + (k+1)*nxx*nzz]) +
+                             9.0f*(Vy[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vy[(i+2) + j*nzz + (k+1)*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vy[(i-1) + j*nzz + (k+1)*nxx*nzz])) / (60.0f*dz);
+
+            float dVy_dz = 0.5f*(dVy_dz1 + dVy_dz2);
+
+            // dVz_dx ---------------------------------------------------------------------
+
+            float dVz_dx1 = (FDM1*(Vz[i + (j-3)*nzz + k*nxx*nzz] - Vz[i + (j+4)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-2)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vz[i + (j-1)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dx;
+
+            float dVz_dx2 = (FDM1*(Vz[(i-1) + (j-3)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+4)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vz[(i-1) + (j+3)*nzz + k*nxx*nzz] - Vz[(i-1) + (j-2)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vz[(i-1) + (j-1)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+2)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vz[(i-1) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-1) + j*nzz + k*nxx*nzz])) / dx;
+
+            float dVz_dx3 = (FDM1*(Vz[i + (j-3)*nzz + (k+1)*nxx*nzz] - Vz[i + (j+4)*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vz[i + (j+3)*nzz + (k+1)*nxx*nzz] - Vz[i + (j-2)*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vz[i + (j-1)*nzz + (k+1)*nxx*nzz] - Vz[i + (j+2)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vz[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + (k+1)*nxx*nzz])) / dx;
+
+            float dVz_dx4 = (FDM1*(Vz[(i-1) + (j-3)*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + (j+4)*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vz[(i-1) + (j+3)*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + (j-2)*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vz[(i-1) + (j-1)*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + (j+2)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vz[(i-1) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + j*nzz + (k+1)*nxx*nzz])) / dx;    
+
+            float dVz_dx = 0.25f*(dVz_dx1 + dVz_dx2 + dVz_dx3 + dVz_dx4);    
+
+            // dVz_dy ---------------------------------------------------------------------
+
+            float dVz_dy1 = (FDM1*(Vz[i + j*nzz + (k-3)*nxx*nzz] - Vz[i + j*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vz[i + j*nzz + (k-1)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dy;
+
+            float dVz_dy2 = (FDM1*(Vz[(i-1) + j*nzz + (k-3)*nxx*nzz] - Vz[(i-1) + j*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vz[(i-1) + j*nzz + (k+3)*nxx*nzz] - Vz[(i-1) + j*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vz[(i-1) + j*nzz + (k-1)*nxx*nzz] - Vz[(i-1) + j*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vz[(i-1) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + j*nzz + k*nxx*nzz])) / dy;
+
+            float dVz_dy3 = (FDM1*(Vz[i + (j+1)*nzz + (k-3)*nxx*nzz] - Vz[i + (j+1)*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vz[i + (j+1)*nzz + (k+3)*nxx*nzz] - Vz[i + (j+1)*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vz[i + (j+1)*nzz + (k-1)*nxx*nzz] - Vz[i + (j+1)*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vz[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[i + (j+1)*nzz + k*nxx*nzz])) / dy;    
+
+            float dVz_dy4 = (FDM1*(Vz[(i-1) + (j+1)*nzz + (k-3)*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vz[(i-1) + (j+1)*nzz + (k+3)*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vz[(i-1) + (j+1)*nzz + (k-1)*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vz[(i-1) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / dy;    
+
+            float dVz_dy = 0.25f*(dVz_dy1 + dVz_dy2 + dVz_dy3 + dVz_dy4);    
+
+            // dVz_dz ---------------------------------------------------------------------
+            
+            float dVz_dz1 = (FDM1*(Vz[(i-4) + j*nzz + k*nxx*nzz] - Vz[(i+3) + j*nzz + k*nxx*nzz]) +
+                             FDM2*(Vz[(i+2) + j*nzz + k*nxx*nzz] - Vz[(i-3) + j*nzz + k*nxx*nzz]) +
+                             FDM3*(Vz[(i-2) + j*nzz + k*nxx*nzz] - Vz[(i+1) + j*nzz + k*nxx*nzz]) +
+                             FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[(i-1) + j*nzz + k*nxx*nzz])) / dz;    
+
+            float dVz_dz2 = (FDM1*(Vz[(i-4) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vz[(i+2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / dz;    
+
+            float dVz_dz3 = (FDM1*(Vz[(i-4) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vz[(i+2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vz[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / dz;    
+
+            float dVz_dz4 = (FDM1*(Vz[(i-4) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vz[(i+2) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vz[(i-2) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vz[i + (j+1)*nzz + (k+1)*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + (k+1)*nxx*nzz])) / dz;    
+
+            float dVz_dz = 0.25f*(dVz_dz1 + dVz_dz2 + dVz_dz3 + dVz_dz4);    
+
+            // Constants ---------------------------------------------------------------------
 
             c16_1 = (minC16 + (static_cast<float>(C16[i + (j+1)*nzz + (k+1)*nxx*nzz]) - 1.0f) * (maxC16 - minC16) / (COMPRESS - 1));
             c16_2 = (minC16 + (static_cast<float>(C16[i + (j+1)*nzz + k*nxx*nzz]) - 1.0f) * (maxC16 - minC16) / (COMPRESS - 1));
@@ -525,6 +668,8 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
             float c66 = 1.0f / (0.25f*(1.0f/c66_1 + 1.0f/c66_2 + 1.0f/c66_3 + 1.0f/c66_4));            
 
+            // Equation ---------------------------------------------------------------------
+
             Txy[index] += dt*(c16*dVx_dx + c66*dVx_dy + c56*dVx_dz +
                               c66*dVy_dx + c26*dVy_dy + c46*dVy_dz +
                               c56*dVz_dx + c46*dVz_dy + c36*dVz_dz);                    
@@ -532,50 +677,141 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
 
         if((i >= 3) && (i < nzz-4) && (j >= 3) && (j < nxx-4) && (k > 3) && (k < nyy-3)) 
         {
-            float dVx_dx = (FDM1*(Vx[i + (j-3)*nzz + k*nxx*nzz] - Vx[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[i + (j+3)*nzz + k*nxx*nzz] - Vx[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[i + (j-1)*nzz + k*nxx*nzz] - Vx[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[i + (j+1)*nzz + k*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dx;
+            // dVx_dx ---------------------------------------------------------------------
+            
+            float dVx_dx1 = (1.0f*(Vx[i + (j+3)*nzz + k*nxx*nzz] - Vx[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[i + (j-2)*nzz + k*nxx*nzz] - Vx[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[i + (j+1)*nzz + k*nxx*nzz] - Vx[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx);
 
-            float dVy_dx = (FDM1*(Vy[i + (j-3)*nzz + k*nxx*nzz] - Vy[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[i + (j-1)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx2 = (1.0f*(Vx[(i+1) + (j+3)*nzz + k*nxx*nzz] - Vx[(i+1) + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vx[(i+1) + (j-2)*nzz + k*nxx*nzz] - Vx[(i+1) + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vx[(i+1) + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx);
 
-            float dVz_dx = (FDM1*(Vz[i + (j-3)*nzz + k*nxx*nzz] - Vz[i + (j+4)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-2)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[i + (j-1)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx = 0.5f*(dVx_dx1 + dVx_dx2);
 
-            float dVx_dy = (FDM1*(Vx[i + j*nzz + (k-4)*nxx*nzz] - Vx[i + j*nzz + (k+3)*nxx*nzz]) +
-                            FDM2*(Vx[i + j*nzz + (k+2)*nxx*nzz] - Vx[i + j*nzz + (k-3)*nxx*nzz]) +
-                            FDM3*(Vx[i + j*nzz + (k-2)*nxx*nzz] - Vx[i + j*nzz + (k+1)*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+            // dVx_dy ---------------------------------------------------------------------
 
-            float dVy_dy = (FDM1*(Vy[i + j*nzz + (k-4)*nxx*nzz] - Vy[i + j*nzz + (k+3)*nxx*nzz]) +
-                            FDM2*(Vy[i + j*nzz + (k+2)*nxx*nzz] - Vy[i + j*nzz + (k-3)*nxx*nzz]) +
-                            FDM3*(Vy[i + j*nzz + (k-2)*nxx*nzz] - Vy[i + j*nzz + (k+1)*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+            float dVx_dy1 = (1.0f*(Vx[i + j*nzz + (k+3)*nxx*nzz] - Vx[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vx[i + j*nzz + (k-2)*nxx*nzz] - Vx[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vx[i + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
 
-            float dVz_dy = (FDM1*(Vz[i + j*nzz + (k-4)*nxx*nzz] - Vz[i + j*nzz + (k+3)*nxx*nzz]) +
-                            FDM2*(Vz[i + j*nzz + (k+2)*nxx*nzz] - Vz[i + j*nzz + (k-3)*nxx*nzz]) +
-                            FDM3*(Vz[i + j*nzz + (k-2)*nxx*nzz] - Vz[i + j*nzz + (k+1)*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+            float dVx_dy2 = (1.0f*(Vx[(i+1) + j*nzz + (k+3)*nxx*nzz] - Vx[(i+1) + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vx[(i+1) + j*nzz + (k-2)*nxx*nzz] - Vx[(i+1) + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vx[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vx[(i+1) + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVx_dy = 0.5f*(dVx_dy1 + dVx_dy2);
+
+            // dVx_dz ---------------------------------------------------------------------
 
             float dVx_dz = (FDM1*(Vx[(i-3) + j*nzz + k*nxx*nzz] - Vx[(i+4) + j*nzz + k*nxx*nzz]) +
                             FDM2*(Vx[(i+3) + j*nzz + k*nxx*nzz] - Vx[(i-2) + j*nzz + k*nxx*nzz]) +
                             FDM3*(Vx[(i-1) + j*nzz + k*nxx*nzz] - Vx[(i+2) + j*nzz + k*nxx*nzz]) +
                             FDM4*(Vx[(i+1) + j*nzz + k*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dz;
 
-            float dVy_dz = (FDM1*(Vy[(i-3) + j*nzz + k*nxx*nzz] - Vy[(i+4) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[(i+3) + j*nzz + k*nxx*nzz] - Vy[(i-2) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[(i-1) + j*nzz + k*nxx*nzz] - Vy[(i+2) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[(i+1) + j*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dz;
+            // dVy_dx ---------------------------------------------------------------------
 
-            float dVz_dz = (FDM1*(Vz[(i-3) + j*nzz + k*nxx*nzz] - Vz[(i+4) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[(i+3) + j*nzz + k*nxx*nzz] - Vz[(i-2) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[(i-1) + j*nzz + k*nxx*nzz] - Vz[(i+2) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[(i+1) + j*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dz;
+            float dVy_dx1 = (FDM1*(Vy[i + (j-3)*nzz + k*nxx*nzz] - Vy[i + (j+4)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-2)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vy[i + (j-1)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dx;
+
+            float dVy_dx2 = (FDM1*(Vy[i + (j-3)*nzz + (k-1)*nxx*nzz] - Vy[i + (j+4)*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vy[i + (j+3)*nzz + (k-1)*nxx*nzz] - Vy[i + (j-2)*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vy[i + (j-1)*nzz + (k-1)*nxx*nzz] - Vy[i + (j+2)*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vy[i + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[i + j*nzz + (k-1)*nxx*nzz])) / dx;
+
+            float dVy_dx3 = (FDM1*(Vy[(i+1) + (j-3)*nzz + k*nxx*nzz] - Vy[(i+1) + (j+4)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vy[(i+1) + (j+3)*nzz + k*nxx*nzz] - Vy[(i+1) + (j-2)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vy[(i+1) + (j-1)*nzz + k*nxx*nzz] - Vy[(i+1) + (j+2)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vy[(i+1) + j*nzz + k*nxx*nzz])) / dx;
+
+            float dVy_dx4 = (FDM1*(Vy[(i+1) + (j-3)*nzz + (k-1)*nxx*nzz] - Vy[(i+1) + (j+4)*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vy[(i+1) + (j+3)*nzz + (k-1)*nxx*nzz] - Vy[(i+1) + (j-2)*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vy[(i+1) + (j-1)*nzz + (k-1)*nxx*nzz] - Vy[(i+1) + (j+2)*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[(i+1) + j*nzz + (k-1)*nxx*nzz])) / dx;
+
+            float dVy_dx = 0.25f*(dVy_dx1 + dVy_dx2 + dVy_dx3 + dVy_dx4);    
+
+            // dVy_dy ---------------------------------------------------------------------
+
+            float dVy_dy1 = (FDM1*(Vy[i + j*nzz + (k-4)*nxx*nzz] - Vy[i + j*nzz + (k+3)*nxx*nzz]) +
+                             FDM2*(Vy[i + j*nzz + (k+2)*nxx*nzz] - Vy[i + j*nzz + (k-3)*nxx*nzz]) +
+                             FDM3*(Vy[i + j*nzz + (k-2)*nxx*nzz] - Vy[i + j*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[i + j*nzz + (k-1)*nxx*nzz])) / dy;
+
+            float dVy_dy2 = (FDM1*(Vy[i + (j+1)*nzz + (k-4)*nxx*nzz] - Vy[i + (j+1)*nzz + (k+3)*nxx*nzz]) +
+                             FDM2*(Vy[i + (j+1)*nzz + (k+2)*nxx*nzz] - Vy[i + (j+1)*nzz + (k-3)*nxx*nzz]) +
+                             FDM3*(Vy[i + (j+1)*nzz + (k-2)*nxx*nzz] - Vy[i + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vy[i + (j+1)*nzz + k*nxx*nzz]     - Vy[i + (j+1)*nzz + (k-1)*nxx*nzz])) / dy;
+
+            float dVy_dy3 = (FDM1*(Vy[(i+1) + j*nzz + (k-4)*nxx*nzz] - Vy[(i+1) + j*nzz + (k+3)*nxx*nzz]) +
+                             FDM2*(Vy[(i+1) + j*nzz + (k+2)*nxx*nzz] - Vy[(i+1) + j*nzz + (k-3)*nxx*nzz]) +
+                             FDM3*(Vy[(i+1) + j*nzz + (k-2)*nxx*nzz] - Vy[(i+1) + j*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + j*nzz + k*nxx*nzz]     - Vy[(i+1) + j*nzz + (k-1)*nxx*nzz])) / dy;
+
+            float dVy_dy4 = (FDM1*(Vy[(i+1) + (j+1)*nzz + (k-4)*nxx*nzz] - Vy[(i+1) + (j+1)*nzz + (k+3)*nxx*nzz]) +
+                             FDM2*(Vy[(i+1) + (j+1)*nzz + (k+2)*nxx*nzz] - Vy[(i+1) + (j+1)*nzz + (k-3)*nxx*nzz]) +
+                             FDM3*(Vy[(i+1) + (j+1)*nzz + (k-2)*nxx*nzz] - Vy[(i+1) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + (j+1)*nzz + k*nxx*nzz]     - Vy[(i+1) + (j+1)*nzz + (k-1)*nxx*nzz])) / dy;
+
+            float dVy_dy = 0.25f*(dVy_dy1 + dVy_dy2 + dVy_dy3 + dVy_dy4);    
+
+            // dVy_dz ---------------------------------------------------------------------
+
+            float dVy_dz1 = (FDM1*(Vy[(i-3) + j*nzz + k*nxx*nzz] - Vy[(i+4) + j*nzz + k*nxx*nzz]) +
+                             FDM2*(Vy[(i+3) + j*nzz + k*nxx*nzz] - Vy[(i-2) + j*nzz + k*nxx*nzz]) +
+                             FDM3*(Vy[(i-1) + j*nzz + k*nxx*nzz] - Vy[(i+2) + j*nzz + k*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + j*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dz;
+
+            float dVy_dz2 = (FDM1*(Vy[(i-3) + j*nzz + (k-1)*nxx*nzz] - Vy[(i+4) + j*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vy[(i+3) + j*nzz + (k-1)*nxx*nzz] - Vy[(i-2) + j*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vy[(i-1) + j*nzz + (k-1)*nxx*nzz] - Vy[(i+2) + j*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + j*nzz + (k-1)*nxx*nzz] - Vy[i + j*nzz + (k-1)*nxx*nzz])) / dz;
+
+            float dVy_dz3 = (FDM1*(Vy[(i-3) + (j+1)*nzz + k*nxx*nzz] - Vy[(i+4) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vy[(i+3) + (j+1)*nzz + k*nxx*nzz] - Vy[(i-2) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vy[(i-1) + (j+1)*nzz + k*nxx*nzz] - Vy[(i+2) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vy[i + (j+1)*nzz + k*nxx*nzz])) / dz;
+
+            float dVy_dz4 = (FDM1*(Vy[(i-3) + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[(i+4) + (j+1)*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vy[(i+3) + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[(i-2) + (j+1)*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vy[(i-1) + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[(i+2) + (j+1)*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vy[(i+1) + (j+1)*nzz + (k-1)*nxx*nzz] - Vy[i + (j+1)*nzz + (k-1)*nxx*nzz])) / dz;
+
+            float dVy_dz = 0.25f*(dVy_dz1 + dVy_dz2 + dVy_dz3 + dVy_dz4);    
+
+            // dVz_dx ---------------------------------------------------------------------
+
+            float dVz_dx = (FDM1*(Vz[i + (j-3)*nzz + k*nxx*nzz] - Vz[i + (j+4)*nzz + k*nxx*nzz]) +
+                            FDM2*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-2)*nzz + k*nxx*nzz]) +
+                            FDM3*(Vz[i + (j-1)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
+                            FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dx;
+
+            // dVz_dy ---------------------------------------------------------------------
+
+            float dVz_dy1 = (1.0f*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vz[i + j*nzz + (k-2)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVz_dy2 = (1.0f*(Vz[i + (j+1)*nzz + (k+3)*nxx*nzz] - Vz[i + (j+1)*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vz[i + (j+1)*nzz + (k-2)*nxx*nzz] - Vz[i + (j+1)*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vz[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[i + (j+1)*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVz_dy = 0.5f*(dVz_dy1 + dVz_dy2);
+
+            // dVz_dz ---------------------------------------------------------------------
+
+            float dVz_dz1 = (1.0f*(Vz[(i+3) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+2) + (j+1)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / (60.0f*dz);
+
+            float dVz_dz2 = (1.0f*(Vz[(i+3) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+2) + (j+1)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / (60.0f*dz);
+
+            float dVz_dz = 0.5f*(dVz_dz1 + dVz_dz2);
+
+            // Constants ---------------------------------------------------------------------
 
             c15_1 = (minC15 + (static_cast<float>(C15[(i+1) + (j+1)*nzz + k*nxx*nzz]) - 1.0f) * (maxC15 - minC15) / (COMPRESS - 1));
             c15_2 = (minC15 + (static_cast<float>(C15[i + (j+1)*nzz + k*nxx*nzz]) - 1.0f) * (maxC15 - minC15) / (COMPRESS - 1));
@@ -614,6 +850,8 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             float c55 = 1.0f / (0.25f*(1.0f/c55_1 + 1.0f/c55_2 + 1.0f/c55_3 + 1.0f/c55_4));
             float c56 = 1.0f / (0.25f*(1.0f/c56_1 + 1.0f/c56_2 + 1.0f/c56_3 + 1.0f/c56_4));
 
+            // Equation ---------------------------------------------------------------------
+
             Txz[index] += dt*(c15*dVx_dx + c56*dVx_dy + c55*dVx_dz +
                               c56*dVy_dx + c25*dVy_dy + c45*dVy_dz +
                               c55*dVz_dx + c45*dVz_dy + c35*dVz_dz);                    
@@ -621,50 +859,141 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
 
         if((i >= 3) && (i < nzz-4) && (j > 3) && (j < nxx-3) && (k >= 3) && (k < nyy-4)) 
         {
-            float dVx_dx = (FDM1*(Vx[i + (j-4)*nzz + k*nxx*nzz] - Vx[i + (j+3)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[i + (j+2)*nzz + k*nxx*nzz] - Vx[i + (j-3)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[i + (j-2)*nzz + k*nxx*nzz] - Vx[i + (j+1)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+            // dVx_dx ---------------------------------------------------------------------
+            
+            float dVx_dx1 = (FDM1*(Vx[i + (j-4)*nzz + k*nxx*nzz] - Vx[i + (j+3)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vx[i + (j+2)*nzz + k*nxx*nzz] - Vx[i + (j-3)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vx[i + (j-2)*nzz + k*nxx*nzz] - Vx[i + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vx[i + j*nzz + k*nxx*nzz]     - Vx[i + (j-1)*nzz + k*nxx*nzz])) / dx;
 
-            float dVy_dx = (FDM1*(Vy[i + (j-4)*nzz + k*nxx*nzz] - Vy[i + (j+3)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vy[i + (j+2)*nzz + k*nxx*nzz] - Vy[i + (j-3)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vy[i + (j-2)*nzz + k*nxx*nzz] - Vy[i + (j+1)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + k*nxx*nzz]     - Vy[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx2 = (FDM1*(Vx[i + (j-4)*nzz + (k-1)*nxx*nzz] - Vx[i + (j+3)*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vx[i + (j+2)*nzz + (k-1)*nxx*nzz] - Vx[i + (j-3)*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vx[i + (j-2)*nzz + (k-1)*nxx*nzz] - Vx[i + (j+1)*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vx[i + j*nzz + (k-1)*nxx*nzz]     - Vx[i + (j-1)*nzz + (k-1)*nxx*nzz])) / dx; 
+        
+            float dVx_dx3 = (FDM1*(Vx[(i+1) + (j-4)*nzz + k*nxx*nzz] - Vx[(i+1) + (j+3)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vx[(i+1) + (j+2)*nzz + k*nxx*nzz] - Vx[(i+1) + (j-3)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vx[(i+1) + (j-2)*nzz + k*nxx*nzz] - Vx[(i+1) + (j+1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + j*nzz + k*nxx*nzz]     - Vx[(i+1) + (j-1)*nzz + k*nxx*nzz])) / dx; 
+            
+            float dVx_dx4 = (FDM1*(Vx[(i+1) + (j-4)*nzz + (k-1)*nxx*nzz] - Vx[(i+1) + (j+3)*nzz + (k-1)*nxx*nzz]) +
+                             FDM2*(Vx[(i+1) + (j+2)*nzz + (k-1)*nxx*nzz] - Vx[(i+1) + (j-3)*nzz + (k-1)*nxx*nzz]) +
+                             FDM3*(Vx[(i+1) + (j-2)*nzz + (k-1)*nxx*nzz] - Vx[(i+1) + (j+1)*nzz + (k-1)*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + j*nzz + (k-1)*nxx*nzz]     - Vx[(i+1) + (j-1)*nzz + (k-1)*nxx*nzz])) / dx; 
 
-            float dVz_dx = (FDM1*(Vz[i + (j-4)*nzz + k*nxx*nzz] - Vz[i + (j+3)*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[i + (j+2)*nzz + k*nxx*nzz] - Vz[i + (j-3)*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[i + (j-2)*nzz + k*nxx*nzz] - Vz[i + (j+1)*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + k*nxx*nzz]     - Vz[i + (j-1)*nzz + k*nxx*nzz])) / dx;
+            float dVx_dx = 0.25f*(dVx_dx1 + dVx_dx2 + dVx_dx3 + dVx_dx4);
 
-            float dVx_dy = (FDM1*(Vx[i + j*nzz + (k-3)*nxx*nzz] - Vx[i + j*nzz + (k+4)*nxx*nzz]) +
-                            FDM2*(Vx[i + j*nzz + (k+3)*nxx*nzz] - Vx[i + j*nzz + (k-2)*nxx*nzz]) +
-                            FDM3*(Vx[i + j*nzz + (k-1)*nxx*nzz] - Vx[i + j*nzz + (k+2)*nxx*nzz]) +
-                            FDM4*(Vx[i + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dy;
+            // dVx_dy ---------------------------------------------------------------------
 
-            float dVy_dy = (FDM1*(Vy[i + j*nzz + (k-3)*nxx*nzz] - Vy[i + j*nzz + (k+4)*nxx*nzz]) +
-                            FDM2*(Vy[i + j*nzz + (k+3)*nxx*nzz] - Vy[i + j*nzz + (k-2)*nxx*nzz]) +
-                            FDM3*(Vy[i + j*nzz + (k-1)*nxx*nzz] - Vy[i + j*nzz + (k+2)*nxx*nzz]) +
-                            FDM4*(Vy[i + j*nzz + (k+1)*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dy;
+            float dVx_dy1 = (FDM1*(Vx[i + j*nzz + (k-3)*nxx*nzz] - Vx[i + j*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vx[i + j*nzz + (k+3)*nxx*nzz] - Vx[i + j*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vx[i + j*nzz + (k-1)*nxx*nzz] - Vx[i + j*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vx[i + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dy;
 
-            float dVz_dy = (FDM1*(Vz[i + j*nzz + (k-3)*nxx*nzz] - Vz[i + j*nzz + (k+4)*nxx*nzz]) +
-                            FDM2*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-2)*nxx*nzz]) +
-                            FDM3*(Vz[i + j*nzz + (k-1)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
-                            FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dy;
+            float dVx_dy2 = (FDM1*(Vx[i + (j-1)*nzz + (k-3)*nxx*nzz] - Vx[i + (j-1)*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vx[i + (j-1)*nzz + (k+3)*nxx*nzz] - Vx[i + (j-1)*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vx[i + (j-1)*nzz + (k-1)*nxx*nzz] - Vx[i + (j-1)*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vx[i + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[i + (j-1)*nzz + k*nxx*nzz])) / dy; 
+        
+            float dVx_dy3 = (FDM1*(Vx[(i+1) + j*nzz + (k-3)*nxx*nzz] - Vx[(i+1) + j*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vx[(i+1) + j*nzz + (k+3)*nxx*nzz] - Vx[(i+1) + j*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vx[(i+1) + j*nzz + (k-1)*nxx*nzz] - Vx[(i+1) + j*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vx[(i+1) + j*nzz + k*nxx*nzz])) / dy; 
+            
+            float dVx_dy4 = (FDM1*(Vx[(i+1) + (j-1)*nzz + (k-3)*nxx*nzz] - Vx[(i+1) + (j-1)*nzz + (k+4)*nxx*nzz]) +
+                             FDM2*(Vx[(i+1) + (j-1)*nzz + (k+3)*nxx*nzz] - Vx[(i+1) + (j-1)*nzz + (k-2)*nxx*nzz]) +
+                             FDM3*(Vx[(i+1) + (j-1)*nzz + (k-1)*nxx*nzz] - Vx[(i+1) + (j-1)*nzz + (k+2)*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[(i+1) + (j-1)*nzz + k*nxx*nzz])) / dy; 
 
-            float dVx_dz = (FDM1*(Vx[(i-3) + j*nzz + k*nxx*nzz] - Vx[(i+4) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vx[(i+3) + j*nzz + k*nxx*nzz] - Vx[(i-2) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vx[(i-1) + j*nzz + k*nxx*nzz] - Vx[(i+2) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vx[(i+1) + j*nzz + k*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dz;
+            float dVx_dy = 0.25f*(dVx_dy1 + dVx_dy2 + dVx_dy3 + dVx_dy4);
+
+            // dVx_dz ---------------------------------------------------------------------
+
+            float dVx_dz1 = (FDM1*(Vx[(i-3) + j*nzz + k*nxx*nzz] - Vx[(i+4) + j*nzz + k*nxx*nzz]) +
+                             FDM2*(Vx[(i+3) + j*nzz + k*nxx*nzz] - Vx[(i-2) + j*nzz + k*nxx*nzz]) +
+                             FDM3*(Vx[(i-1) + j*nzz + k*nxx*nzz] - Vx[(i+2) + j*nzz + k*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + j*nzz + k*nxx*nzz] - Vx[i + j*nzz + k*nxx*nzz])) / dz;
+
+            float dVx_dz2 = (FDM1*(Vx[(i-3) + (j-1)*nzz + k*nxx*nzz] - Vx[(i+4) + (j-1)*nzz + k*nxx*nzz]) +
+                             FDM2*(Vx[(i+3) + (j-1)*nzz + k*nxx*nzz] - Vx[(i-2) + (j-1)*nzz + k*nxx*nzz]) +
+                             FDM3*(Vx[(i-1) + (j-1)*nzz + k*nxx*nzz] - Vx[(i+2) + (j-1)*nzz + k*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + (j-1)*nzz + k*nxx*nzz] - Vx[i + (j-1)*nzz + k*nxx*nzz])) / dz; 
+        
+            float dVx_dz3 = (FDM1*(Vx[(i-3) + j*nzz + (k+1)*nxx*nzz] - Vx[(i+4) + j*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vx[(i+3) + j*nzz + (k+1)*nxx*nzz] - Vx[(i-2) + j*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vx[(i-1) + j*nzz + (k+1)*nxx*nzz] - Vx[(i+2) + j*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vx[i + j*nzz + (k+1)*nxx*nzz])) / dz; 
+            
+            float dVx_dz4 = (FDM1*(Vx[(i-3) + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[(i+4) + (j-1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vx[(i+3) + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[(i-2) + (j-1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vx[(i-1) + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[(i+2) + (j-1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vx[(i+1) + (j-1)*nzz + (k+1)*nxx*nzz] - Vx[i + (j-1)*nzz + (k+1)*nxx*nzz])) / dz;  
+
+            float dVx_dz = 0.25f*(dVx_dz1 + dVx_dz2 + dVx_dz3 + dVx_dz4);
+
+            // dVy_dx ---------------------------------------------------------------------
+
+            float dVy_dx1 = (1.0f*(Vy[i + (j+3)*nzz + k*nxx*nzz] - Vy[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vy[i + (j-2)*nzz + k*nxx*nzz] - Vy[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vy[i + (j+1)*nzz + k*nxx*nzz] - Vy[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx);
+
+            float dVy_dx2 = (1.0f*(Vy[(i+1) + (j+3)*nzz + k*nxx*nzz] - Vy[(i+1) + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vy[(i+1) + (j-2)*nzz + k*nxx*nzz] - Vy[(i+1) + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vy[(i+1) + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx); 
+            
+            float dVy_dx = 0.5f*(dVy_dx1 + dVy_dx2);
+
+            // dVy_dy ---------------------------------------------------------------------
+
+            float dVy_dy1 = (1.0f*(Vy[i + j*nzz + (k+3)*nxx*nzz] - Vy[i + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vy[i + j*nzz + (k-2)*nxx*nzz] - Vy[i + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vy[i + j*nzz + (k+1)*nxx*nzz] - Vy[i + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy);
+
+            float dVy_dy2 = (1.0f*(Vy[(i+1) + j*nzz + (k+3)*nxx*nzz] - Vy[(i+1) + j*nzz + (k-3)*nxx*nzz]) +
+                             9.0f*(Vy[(i+1) + j*nzz + (k-2)*nxx*nzz] - Vy[(i+1) + j*nzz + (k+2)*nxx*nzz]) +
+                            45.0f*(Vy[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vy[(i+1) + j*nzz + (k-1)*nxx*nzz])) / (60.0f*dy); 
+            
+            float dVy_dy = 0.5f*(dVy_dy1 + dVy_dy2);
+
+            // dVy_dz ---------------------------------------------------------------------
 
             float dVy_dz = (FDM1*(Vy[(i-3) + j*nzz + k*nxx*nzz] - Vy[(i+4) + j*nzz + k*nxx*nzz]) +
                             FDM2*(Vy[(i+3) + j*nzz + k*nxx*nzz] - Vy[(i-2) + j*nzz + k*nxx*nzz]) +
                             FDM3*(Vy[(i-1) + j*nzz + k*nxx*nzz] - Vy[(i+2) + j*nzz + k*nxx*nzz]) +
                             FDM4*(Vy[(i+1) + j*nzz + k*nxx*nzz] - Vy[i + j*nzz + k*nxx*nzz])) / dz;
 
-            float dVz_dz = (FDM1*(Vz[(i-3) + j*nzz + k*nxx*nzz] - Vz[(i+4) + j*nzz + k*nxx*nzz]) +
-                            FDM2*(Vz[(i+3) + j*nzz + k*nxx*nzz] - Vz[(i-2) + j*nzz + k*nxx*nzz]) +
-                            FDM3*(Vz[(i-1) + j*nzz + k*nxx*nzz] - Vz[(i+2) + j*nzz + k*nxx*nzz]) +
-                            FDM4*(Vz[(i+1) + j*nzz + k*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dz;
+            // dVz_dx ---------------------------------------------------------------------
+
+            float dVz_dx1 = (1.0f*(Vz[i + (j+3)*nzz + k*nxx*nzz] - Vz[i + (j-3)*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[i + (j-2)*nzz + k*nxx*nzz] - Vz[i + (j+2)*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[i + (j+1)*nzz + k*nxx*nzz] - Vz[i + (j-1)*nzz + k*nxx*nzz])) / (60.0f*dx);
+
+            float dVz_dx2 = (1.0f*(Vz[i + (j+3)*nzz + (k+1)*nxx*nzz] - Vz[i + (j-3)*nzz + (k+1)*nxx*nzz]) +
+                             9.0f*(Vz[i + (j-2)*nzz + (k+1)*nxx*nzz] - Vz[i + (j+2)*nzz + (k+1)*nxx*nzz]) +
+                            45.0f*(Vz[i + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[i + (j-1)*nzz + (k+1)*nxx*nzz])) / (60.0f*dx);
+            
+            float dVz_dx = 0.5f*(dVz_dx1 + dVz_dx2);
+
+            // dVz_dy ---------------------------------------------------------------------
+
+            float dVz_dy = (FDM1*(Vz[i + j*nzz + (k-3)*nxx*nzz] - Vz[i + j*nzz + (k+4)*nxx*nzz]) +
+                            FDM2*(Vz[i + j*nzz + (k+3)*nxx*nzz] - Vz[i + j*nzz + (k-2)*nxx*nzz]) +
+                            FDM3*(Vz[i + j*nzz + (k-1)*nxx*nzz] - Vz[i + j*nzz + (k+2)*nxx*nzz]) +
+                            FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz] - Vz[i + j*nzz + k*nxx*nzz])) / dy;
+
+            // dVz_dz ---------------------------------------------------------------------
+
+            float dVz_dz1 = (1.0f*(Vz[(i+3) + j*nzz + k*nxx*nzz] - Vz[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[(i-2) + j*nzz + k*nxx*nzz] - Vz[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[(i+1) + j*nzz + k*nxx*nzz] - Vz[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz);
+
+            float dVz_dz2 = (1.0f*(Vz[(i+3) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + j*nzz + (k+1)*nxx*nzz]) +
+                             9.0f*(Vz[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+2) + j*nzz + (k+1)*nxx*nzz]) +
+                            45.0f*(Vz[(i+1) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-1) + j*nzz + (k+1)*nxx*nzz])) / (60.0f*dz); 
+            
+            float dVz_dz = 0.5f*(dVz_dz1 + dVz_dz2);
+
+            // Constants ---------------------------------------------------------------------
                             
             c14_1 = (minC14 + (static_cast<float>(C14[(i+1) + j*nzz + (k+1)*nxx*nzz]) - 1.0f) * (maxC14 - minC14) / (COMPRESS - 1));
             c14_2 = (minC14 + (static_cast<float>(C14[i + j*nzz + (k+1)*nxx*nzz]) - 1.0f) * (maxC14 - minC14) / (COMPRESS - 1));
@@ -703,6 +1032,8 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
             float c45 = 1.0f / (0.25f*(1.0f/c45_1 + 1.0f/c45_2 + 1.0f/c45_3 + 1.0f/c45_4));
             float c46 = 1.0f / (0.25f*(1.0f/c46_1 + 1.0f/c46_2 + 1.0f/c46_3 + 1.0f/c46_4));
 
+            // Equation ---------------------------------------------------------------------
+
             Tyz[index] += dt*(c14*dVx_dx + c46*dVx_dy + c45*dVx_dz +
                               c46*dVy_dx + c24*dVy_dy + c44*dVy_dz +
                               c45*dVz_dx + c44*dVz_dy + c34*dVz_dz); 
@@ -710,10 +1041,10 @@ __global__ void uintc_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, f
     }
 }
 
-__global__ void float_compute_pressure_ssg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * P, float * T, 
-                                           float * C11, float * C12, float * C13, float * C14, float * C15, float * C16, float * C22, float * C23, float * C24, float * C25, float * C26, 
-                                           float * C33, float * C34, float * C35, float * C36, float * C44, float * C45, float * C46, float * C55, float * C56, float * C66, int tId, 
-                                           int tlag, float dx, float dy, float dz, float dt, int nxx, int nyy, int nzz, bool eikonal)
+__global__ void float_compute_pressure_issg(float * Vx, float * Vy, float * Vz, float * Txx, float * Tyy, float * Tzz, float * Txz, float * Tyz, float * Txy, float * P, float * T, 
+                                            float * C11, float * C12, float * C13, float * C14, float * C15, float * C16, float * C22, float * C23, float * C24, float * C25, float * C26, 
+                                            float * C33, float * C34, float * C35, float * C36, float * C44, float * C45, float * C46, float * C55, float * C56, float * C66, int tId, 
+                                            int tlag, float dx, float dy, float dz, float dt, int nxx, int nyy, int nzz, bool eikonal)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 

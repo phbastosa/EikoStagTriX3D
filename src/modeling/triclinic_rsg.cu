@@ -234,28 +234,6 @@ __global__ void float_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     int j = (int) (index - k*nxx*nzz) / nzz;   
     int i = (int) (index - j*nzz - k*nxx*nzz); 
 
-    if ((index == 0) && (tId < nt))
-    {
-        for (int k = 0; k < DGS; k++)
-        {
-            int yi = sIdy + k - 3;
-            
-            for (int j = 0; j < DGS; j++)
-            {
-                int xi = sIdx + j - 3;
-    
-                for (int i = 0; i < DGS; i++)
-                {
-                    int zi = sIdz + i - 3;
-            
-                    Txx[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
-                    Tyy[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);
-                    Tzz[zi + xi*nzz + yi*nxx*nzz] += skw[i + j*DGS + k*DGS*DGS]*wavelet[tId] / (dx*dy*dz);           
-                }
-            }
-        }
-    }
-
     float d1_Txx = 0.0f; float d2_Txx = 0.0f; float d3_Txx = 0.0f; float d4_Txx = 0.0f;
     float d1_Tyy = 0.0f; float d2_Tyy = 0.0f; float d3_Tyy = 0.0f; float d4_Tyy = 0.0f;
     float d1_Tzz = 0.0f; float d2_Tzz = 0.0f; float d3_Tzz = 0.0f; float d4_Tzz = 0.0f;
