@@ -1032,7 +1032,7 @@ __global__ void float_quasi_slowness(float * T, float * S, float dx, float dy, f
             float Ro = C33[index]*S[index]*S[index];    
 
             for (int indp = 0; indp < v*v; indp++)
-                C[indp] = C[indp] / Ro / Ro;
+                C[indp] = C[indp] / Ro;
 
             for (int indp = 0; indp < n*n; indp++) 
                 G[indp] = 0.0f; 
@@ -1101,7 +1101,7 @@ __global__ void float_quasi_slowness(float * T, float * S, float dx, float dy, f
             if (Gv[1] < Gv[2]) {aux = Gv[1]; Gv[1] = Gv[2]; Gv[2] = aux;}
             if (Gv[0] < Gv[1]) {aux = Gv[0]; Gv[0] = Gv[1]; Gv[1] = aux;}    
 
-            S[index] = 1.0f / sqrtf(Gv[0] * Ro);
+            S[index] = 1.0f / sqrtf(Gv[0] / Ro);
         }
     }
 }
