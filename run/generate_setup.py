@@ -1,113 +1,81 @@
 import numpy as np
 
-nx = 101
-ny = 101
-nz = 101
+# Model aspects
+
+nx = 301
+ny = 301
+nz = 51
 
 dx = 10.0
 dy = 10.0
 dz = 10.0
 
-# Acquisition geometry
+vp = np.array([1500, 1600, 1800, 2000, 2500]) 
+vs = np.array([   0,  950, 1060, 1180, 1470]) 
+ro = np.array([1000, 2350, 2400, 2450, 2500]) 
+z = np.array([  200,   50,  100,  100,   50]) 
 
-nsx = 1
-nsy = 1
+E1 = np.array([0.0, 0.05, 0.10, 0.12, 0.0])
+E2 = np.array([0.0, 0.07, 0.08, 0.10, 0.0])
+D1 = np.array([0.0, 0.03, 0.05, 0.06, 0.0])
+D2 = np.array([0.0, 0.02, 0.03, 0.05, 0.0])
+D3 = np.array([0.0, 0.01, 0.02, 0.03, 0.0])
+G1 = np.array([0.0, 0.05, 0.02, 0.01, 0.0])
+G2 = np.array([0.0, 0.10, 0.08, 0.06, 0.0])
 
-nrx = 39
-nry = 5
+tilt = np.array([0, 10, 15, 20, 0]) * np.pi/180.0
+azmt = np.array([0,  5, 10, 30, 0]) * np.pi/180.0
+
+# Geometry aspects
+
+nsx = 1        
+nsy = 1        
+ 
+nrx = 117      
+nry = 4        
+
+sx_beg = 500   
+sx_end = 500   
+
+sy_beg = 2500  
+sy_end = 2500  
+
+rx_beg = 50    
+rx_end = 2950  
+
+ry_beg = 50    
+ry_end = 2950  
+
+sz = 0          
+rz = 0         
+
+# End of user area
+
+sx, sy = np.meshgrid(np.linspace(sx_beg, sx_end, nsx), 
+                     np.linspace(sy_beg, sy_end, nsy))
+
+rx, ry = np.meshgrid(np.linspace(rx_beg, rx_end, nrx), 
+                     np.linspace(ry_beg, ry_end, nry))
 
 ns = nsx*nsy
 nr = nrx*nry
-
-sx, sy = np.meshgrid(np.linspace(500, 500, nsx), 
-                     np.linspace(500, 500, nsy))
-
-rx, ry = np.meshgrid(np.linspace(25, 975, nrx), 
-                     np.linspace(25, 975, nry))
 
 SPS = np.zeros((ns, 3), dtype = float)
 RPS = np.zeros((nr, 3), dtype = float)
 
 SPS[:,0] = np.reshape(sx, [ns], order = "F")
 SPS[:,1] = np.reshape(sy, [ns], order = "F")
-SPS[:,2] = np.zeros(ns) + 500
+SPS[:,2] = np.zeros(ns) + sz
 
 RPS[:,0] = np.reshape(rx, [nr], order = "C")
 RPS[:,1] = np.reshape(ry, [nr], order = "C")
-RPS[:,2] = np.zeros(nr) + 50
+RPS[:,2] = np.zeros(nr) + rz
 
 path_SPS = "../inputs/geometry/EikoStagTriX3D_SPS.txt"
 path_RPS = "../inputs/geometry/EikoStagTriX3D_RPS.txt"
 
 np.savetxt(path_SPS, SPS, fmt = "%.2f", delimiter = ",")
 np.savetxt(path_RPS, RPS, fmt = "%.2f", delimiter = ",")
-
-vp = np.array([2000])
-vs = np.array([1100])
-ro = np.array([2500])
-z = np.array([])
-
-E1 = np.array([0.0])
-E2 = np.array([0.0])
-D1 = np.array([0.0])
-D2 = np.array([0.0])
-D3 = np.array([0.0])
-G1 = np.array([0.0])
-G2 = np.array([0.0])
-
-tilt = np.array([0]) * np.pi/180.0
-azmt = np.array([0]) * np.pi/180.0
-
-# For alpha quartz test -----------------------------------
-
-# rho = 2600
-
-# c11 = 8.67e9
-# c12 = 0.69e9
-# c13 = 1.19e9
-# c14 =-1.80e9
-# c22 = 8.67e9
-# c23 = 1.19e9
-# c24 = 1.80e9
-# c33 = 10.55e9
-# c44 = 5.81e9
-# c55 = 5.81e9
-# c56 =-1.80e9
-# c66 = 3.99e9
-
-# print(np.sqrt(c33/rho))
-
-# S = np.zeros((nz, nx, ny)) + 1.0 / np.sqrt(c33/rho)
-# B = np.zeros((nz, nx, ny)) + 1.0 / rho
-
-# C11 = np.zeros_like(S) + c11
-# C12 = np.zeros_like(S) + c12
-# C13 = np.zeros_like(S) + c13
-# C14 = np.zeros_like(S) + c14
-# C15 = np.zeros_like(S)
-# C16 = np.zeros_like(S)
-
-# C22 = np.zeros_like(S) + c22
-# C23 = np.zeros_like(S) + c23
-# C24 = np.zeros_like(S) + c24
-# C25 = np.zeros_like(S) 
-# C26 = np.zeros_like(S)
-
-# C33 = np.zeros_like(S) + c33
-# C34 = np.zeros_like(S) 
-# C35 = np.zeros_like(S)
-# C36 = np.zeros_like(S)
-
-# C44 = np.zeros_like(S) + c44
-# C45 = np.zeros_like(S) 
-# C46 = np.zeros_like(S)
-
-# C55 = np.zeros_like(S) + c55
-# C56 = np.zeros_like(S) + c56
-
-# C66 = np.zeros_like(S) + c66
-
-# For general testing -----------------------------------
 
 S = np.zeros((nz, nx, ny)) 
 B = np.zeros((nz, nx, ny)) 
