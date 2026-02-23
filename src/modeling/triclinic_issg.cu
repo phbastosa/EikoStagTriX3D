@@ -617,10 +617,10 @@ __global__ void uintc_compute_pressure_issg(float * Vx, float * Vy, float * Vz, 
                              FDM3*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + k*nxx*nzz]) +
                              FDM4*(Vz[i + (j+1)*nzz + k*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / dz;    
 
-            float dVz_dz3 = (FDM1*(Vz[(i-4) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + k*nxx*nzz]) +
-                             FDM2*(Vz[(i+2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
-                             FDM3*(Vz[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + k*nxx*nzz]) +
-                             FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / dz;    
+            float dVz_dz3 = (FDM1*(Vz[(i-4) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM2*(Vz[(i+2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM3*(Vz[(i-2) + j*nzz + (k+1)*nxx*nzz] - Vz[(i+1) + (j+1)*nzz + (k+1)*nxx*nzz]) +
+                             FDM4*(Vz[i + j*nzz + (k+1)*nxx*nzz]     - Vz[(i-1) + (j+1)*nzz + (k+1)*nxx*nzz])) / dz;    
 
             float dVz_dz4 = (FDM1*(Vz[(i-4) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i+3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
                              FDM2*(Vz[(i+2) + (j+1)*nzz + (k+1)*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + (k+1)*nxx*nzz]) +
@@ -801,9 +801,9 @@ __global__ void uintc_compute_pressure_issg(float * Vx, float * Vy, float * Vz, 
 
             // dVz_dz ---------------------------------------------------------------------
 
-            float dVz_dz1 = (1.0f*(Vz[(i+3) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
-                             9.0f*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+2) + (j+1)*nzz + k*nxx*nzz]) +
-                            45.0f*(Vz[(i+1) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-1) + (j+1)*nzz + k*nxx*nzz])) / (60.0f*dz);
+            float dVz_dz1 = (1.0f*(Vz[(i+3) + j*nzz + k*nxx*nzz] - Vz[(i-3) + j*nzz + k*nxx*nzz]) +
+                             9.0f*(Vz[(i-2) + j*nzz + k*nxx*nzz] - Vz[(i+2) + j*nzz + k*nxx*nzz]) +
+                            45.0f*(Vz[(i+1) + j*nzz + k*nxx*nzz] - Vz[(i-1) + j*nzz + k*nxx*nzz])) / (60.0f*dz);
 
             float dVz_dz2 = (1.0f*(Vz[(i+3) + (j+1)*nzz + k*nxx*nzz] - Vz[(i-3) + (j+1)*nzz + k*nxx*nzz]) +
                              9.0f*(Vz[(i-2) + (j+1)*nzz + k*nxx*nzz] - Vz[(i+2) + (j+1)*nzz + k*nxx*nzz]) +
