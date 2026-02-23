@@ -69,10 +69,9 @@ ry_end = 2950  # Final receiver position in y direction [m]
 
 sz = 0         # Sources depth [m] 
 rz = 0         # Receivers depth [m]
-
 ```
 
-Running this code as follows: 
+Make sure you are in the run folder and run the python code as follows: 
 
 `python3 generate_setup.py`
 
@@ -111,7 +110,6 @@ snapshot = true               # To generate snapshots
 beg_snap = 500                # Initial snapshot in samples dimention
 end_snap = 1000               # Final snapshot in samples dimention
 num_snap = 2                  # Number of snapshots   
-
 ```
 
 After set the parameters file you can compile
@@ -129,3 +127,9 @@ Just run
 `python3 -B generate_results.py parameters.txt`
 
 The following figures will be generated for the current setup:
+
+<img width="1800" height="1560" alt="Image" src="https://github.com/user-attachments/assets/83298ca9-303a-4063-a284-6adfb7effd3b"/>
+
+<img width="1800" height="1560" alt="Image" src="https://github.com/user-attachments/assets/9c278f6a-73d7-4fa2-9df9-f8f76547877b"/>
+
+<img width="1800" height="1560" alt="Image" src="https://github.com/user-attachments/assets/b73396e7-e1c6-4487-8964-4fe41146034a"/>
