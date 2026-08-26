@@ -6,9 +6,7 @@ void Triclinic::set_parameters()
     ny = std::stoi(catch_parameter("y_samples", parameters));
     nz = std::stoi(catch_parameter("z_samples", parameters));
 
-    dx = std::stof(catch_parameter("x_spacing", parameters));
-    dy = std::stof(catch_parameter("y_spacing", parameters));
-    dz = std::stof(catch_parameter("z_spacing", parameters));
+    dh = std::stof(catch_parameter("model_spacing", parameters));
 
     nt = std::stoi(catch_parameter("time_samples", parameters));
     dt = std::stof(catch_parameter("time_spacing", parameters));
@@ -488,9 +486,9 @@ void Triclinic::set_dampers()
 
 void Triclinic::set_eikonal()
 {
-    dz2i = 1.0f / (dz*dz);
-    dx2i = 1.0f / (dx*dx);
-    dy2i = 1.0f / (dy*dy);
+    dz2i = 1.0f / (dh*dh);
+    dx2i = 1.0f / (dh*dh);
+    dy2i = 1.0f / (dh*dh);
 
     dz2dx2 = dz2i * dx2i;
     dz2dy2 = dz2i * dy2i;
@@ -543,9 +541,6 @@ void Triclinic::set_geometry()
     cudaMalloc((void**)&(d_rIdz), geometry->nrec*sizeof(int));
     
     cudaMalloc((void**)&(d_rkwPs), DGS*DGS*DGS*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_rkwVx), DGS*DGS*DGS*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_rkwVy), DGS*DGS*DGS*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_rkwVz), DGS*DGS*DGS*geometry->nrec*sizeof(float));
 
     set_rec_weights();
 }
@@ -572,14 +567,8 @@ void Triclinic::set_seismogram()
     sBlocks = (int)((geometry->nrec + NTHREADS - 1) / NTHREADS); 
 
     h_seismogram_Ps = new float[nt*geometry->nrec]();
-    //h_seismogram_Vx = new float[nt*geometry->nrec]();
-    //h_seismogram_Vy = new float[nt*geometry->nrec]();
-    //h_seismogram_Vz = new float[nt*geometry->nrec]();
 
     cudaMalloc((void**)&(d_seismogram_Ps), nt*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_seismogram_Vx), nt*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_seismogram_Vy), nt*geometry->nrec*sizeof(float));
-    //cudaMalloc((void**)&(d_seismogram_Vz), nt*geometry->nrec*sizeof(float));
 }
 
 void Triclinic::set_wavefields()
@@ -616,9 +605,9 @@ void Triclinic::get_shot_position()
     sy = geometry->ysrc[srcId];
     sz = geometry->zsrc[srcId];
 
-    sIdx = (int)((sx + 0.5f*dx) / dx);
-    sIdy = (int)((sy + 0.5f*dy) / dy);
-    sIdz = (int)((sz + 0.5f*dz) / dz);
+    sIdx = (int)((sx + 0.5f*dh) / dh);
+    sIdy = (int)((sy + 0.5f*dh) / dh);
+    sIdz = (int)((sz + 0.5f*dh) / dh);
 
     set_src_weights();
 
@@ -635,7 +624,9 @@ void Triclinic::show_information()
     std::cout << " \033[34mEikoStagTriX3D\033[0;0m -------------------------------------------\n";
     std::cout << "-----------------------------------------------------------\n\n";
 
-    std::cout << "Model dimensions: (z = " << (nz - 1)*dz << ", x = " << (nx - 1) * dx <<", y = " << (ny - 1) * dy << ") m\n\n";
+    std::cout << "Model dimensions: (z = " << (nz - 1)*dh << 
+                                  ", x = " << (nx - 1)*dh <<
+                                  ", y = " << (ny - 1)*dh << ") m\n\n";
 
     std::cout << "Running shot " << srcId + 1 << " of " << geometry->nsrc << " in total\n\n";
 
@@ -675,7 +666,7 @@ void Triclinic::compute_eikonal()
         
         if (compression)
         {
-            uintc_quasi_slowness<<<nBlocks,NTHREADS>>>(d_T,d_S,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,dc_C11,dc_C12,dc_C13,dc_C14,dc_C15,
+            uintc_quasi_slowness<<<nBlocks,NTHREADS>>>(d_T,d_S,dh,dh,dh,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,dc_C11,dc_C12,dc_C13,dc_C14,dc_C15,
                                                        dc_C16,dc_C22,dc_C23,dc_C24,dc_C25,dc_C26,dc_C33,dc_C34,dc_C35,dc_C36,dc_C44,dc_C45,
                                                        dc_C46,dc_C55,dc_C56,dc_C66,minC11,maxC11,minC12,maxC12,minC13,maxC13,minC14,maxC14, 
                                                        minC15,maxC15,minC16,maxC16,minC22,maxC22,minC23,maxC23,minC24,maxC24,minC25,maxC25,
@@ -684,7 +675,7 @@ void Triclinic::compute_eikonal()
         }
         else
         {
-            float_quasi_slowness<<<nBlocks,NTHREADS>>>(d_T,d_S,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,d_C11,d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,
+            float_quasi_slowness<<<nBlocks,NTHREADS>>>(d_T,d_S,dh,dh,dh,sIdx,sIdy,sIdz,nxx,nyy,nzz,nb,d_C11,d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,
                                                        d_C23,d_C24,d_C25,d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55,d_C56,d_C66);
         }
         
@@ -698,7 +689,7 @@ void Triclinic::eikonal_solver()
     dim3 block(MESHDIM,MESHDIM,MESHDIM);
 
     time_set<<<nBlocks,NTHREADS>>>(d_T, volsize);
-    time_init<<<grid,block>>>(d_T,d_S,sx,sy,sz,dx,dy,dz,sIdx,sIdy,sIdz,nxx,nzz,nb);
+    time_init<<<grid,block>>>(d_T,d_S,sx,sy,sz,dh,dh,dh,sIdx,sIdy,sIdz,nxx,nzz,nb);
 
     for (int sweep = 0; sweep < NSWEEPS; sweep++)
     { 
@@ -734,7 +725,7 @@ void Triclinic::eikonal_solver()
             int sgnk = sweep + 2*NSWEEPS;
 
             inner_sweep<<<gs, bs>>>(d_S, d_T, d_sgnt, d_sgnv, sgni, sgnj, sgnk, level, xs, ys, 
-                                    xSweepOff, ySweepOff, zSweepOff, nxx, nyy, nzz, dx, dy, dz, 
+                                    xSweepOff, ySweepOff, zSweepOff, nxx, nyy, nzz, dh, dh, dh, 
                                     dx2i, dy2i, dz2i, dz2dx2, dz2dy2, dx2dy2, dsum);
 	    }
     }
@@ -772,7 +763,7 @@ void Triclinic::source_injection()
     dim3 grid(1,1,1);
     dim3 block(DGS,DGS,DGS);
 
-    if (timeId < nt) apply_pressure_source<<<grid,block>>>(d_Txx, d_Tyy, d_Tzz, d_skw, d_wavelet, sIdx, sIdy, sIdz, timeId, nxx, nzz, dx, dy, dz);     
+    if (timeId < nt) apply_pressure_source<<<grid,block>>>(d_Txx, d_Tyy, d_Tzz, d_skw, d_wavelet, sIdx, sIdy, sIdz, timeId, nxx, nzz, dh, dh, dh);     
 }
 
 void Triclinic::compute_snapshots()
@@ -796,9 +787,6 @@ void Triclinic::compute_snapshots()
 void Triclinic::compute_seismogram()
 {    
     compute_seismogram_GPU<<<sBlocks,NTHREADS>>>(d_P, d_rIdx, d_rIdy, d_rIdz, d_rkwPs, d_seismogram_Ps, geometry->nrec, timeId, tlag, nt, nxx, nzz);     
-    //compute_seismogram_GPU<<<sBlocks,NTHREADS>>>(d_Vx, d_rIdx, d_rIdy, d_rIdz, d_rkwVx, d_seismogram_Vx, geometry->nrec, timeId, tlag, nt, nxx, nzz);     
-    //compute_seismogram_GPU<<<sBlocks,NTHREADS>>>(d_Vy, d_rIdx, d_rIdy, d_rIdz, d_rkwVy, d_seismogram_Vy, geometry->nrec, timeId, tlag, nt, nxx, nzz);     
-    //compute_seismogram_GPU<<<sBlocks,NTHREADS>>>(d_Vz, d_rIdx, d_rIdy, d_rIdz, d_rkwVz, d_seismogram_Vz, geometry->nrec, timeId, tlag, nt, nxx, nzz);     
 }
 
 void Triclinic::show_time_progress()
@@ -819,19 +807,10 @@ void Triclinic::show_time_progress()
 void Triclinic::export_seismograms()
 {   
     cudaMemcpy(h_seismogram_Ps, d_seismogram_Ps, nt*geometry->nrec*sizeof(float), cudaMemcpyDeviceToHost);    
-    //cudaMemcpy(h_seismogram_Vx, d_seismogram_Vx, nt*geometry->nrec*sizeof(float), cudaMemcpyDeviceToHost);    
-    //cudaMemcpy(h_seismogram_Vy, d_seismogram_Vy, nt*geometry->nrec*sizeof(float), cudaMemcpyDeviceToHost);    
-    //cudaMemcpy(h_seismogram_Vz, d_seismogram_Vz, nt*geometry->nrec*sizeof(float), cudaMemcpyDeviceToHost);    
 
     std::string seismPs = seismogram_folder + modeling_type + "_Ps_nStations" + std::to_string(geometry->nrec) + "_nSamples" + std::to_string(nt) + "_shot_" + std::to_string(srcId+1) + ".bin";
-    //std::string seismVx = seismogram_folder + modeling_type + "_Vx_nStations" + std::to_string(geometry->nrec) + "_nSamples" + std::to_string(nt) + "_shot_" + std::to_string(srcId+1) + ".bin";
-    //std::string seismVy = seismogram_folder + modeling_type + "_Vy_nStations" + std::to_string(geometry->nrec) + "_nSamples" + std::to_string(nt) + "_shot_" + std::to_string(srcId+1) + ".bin";
-    //std::string seismVz = seismogram_folder + modeling_type + "_Vz_nStations" + std::to_string(geometry->nrec) + "_nSamples" + std::to_string(nt) + "_shot_" + std::to_string(srcId+1) + ".bin";
 
     export_binary_float(seismPs, h_seismogram_Ps, nt*geometry->nrec);    
-    //export_binary_float(seismVx, h_seismogram_Vx, nt*geometry->nrec);    
-    //export_binary_float(seismVy, h_seismogram_Vy, nt*geometry->nrec);    
-    //export_binary_float(seismVz, h_seismogram_Vz, nt*geometry->nrec);    
 }
 
 int Triclinic::iDivUp(int a, int b) 

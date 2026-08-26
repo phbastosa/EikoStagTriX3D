@@ -9,13 +9,12 @@ folder="../src/modeling"
 
 modeling="$folder/triclinic.cu"
 
-triclinic_ssg="$folder/triclinic_ssg.cu"
 triclinic_rsg="$folder/triclinic_rsg.cu"
 triclinic_issg="$folder/triclinic_issg.cu"
 
 modeling_main="../src/modeling_main.cpp"
 
-modeling_all="$modeling $triclinic_ssg $triclinic_rsg $triclinic_issg"
+modeling_all="$modeling $triclinic_rsg $triclinic_issg"
 
 # Compiler flags --------------------------------------------------------------------------------------
 

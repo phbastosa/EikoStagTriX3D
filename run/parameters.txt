@@ -2,13 +2,11 @@
 # Model paramenters --------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
-x_samples = 301                           # <int>  
-y_samples = 301                           # <int>  
-z_samples = 51                            # <int>  
+x_samples = 401                           # <int>  
+y_samples = 401                           # <int>  
+z_samples = 161                           # <int>  
 
-x_spacing = 10.0                           # [m] <float> 
-y_spacing = 10.0                           # [m] <float> 
-z_spacing = 10.0                           # [m] <float> 
+model_spacing = 12.5                      # [m] <float> 
 
 slowness_file = ../inputs/models/EikoStagTriX3D_slowness.bin
 buoyancy_file = ../inputs/models/EikoStagTriX3D_buoyancy.bin
@@ -25,12 +23,11 @@ RPS = ../inputs/geometry/EikoStagTriX3D_RPS.txt
 #---------------------------------------------------------------------------------------------------
 # Modeling parameters ------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
-# [0] - Triclinic SSG
-# [1] - Triclinic RSG
-# [2] - Triclinic iSSG
+# [0] - Triclinic RSG
+# [1] - Triclinic iSSG
 # --------------------------------------------------------------------------------------------------
 
-modeling_type = 1
+modeling_type = 0
 
 eikonalClip = true
 compression = true
@@ -42,10 +39,10 @@ max_frequency = 30.0
 boundary_samples = 50
 boundary_damping = 0.0045
 
-snapshot = true
-beg_snap = 500
+snapshot = false
+beg_snap = 1000
 end_snap = 1000
-num_snap = 2
+num_snap = 1
 
 snapshot_folder = ../outputs/snapshots/
 seismogram_folder = ../outputs/seismograms/

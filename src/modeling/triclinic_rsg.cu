@@ -13,9 +13,6 @@ void Triclinic_RSG::set_rec_weights()
     int * h_rIdz = new int[geometry->nrec]();
 
     float * h_rkwPs = new float[DGS*DGS*DGS*geometry->nrec]();
-    //float * h_rkwVx = new float[DGS*DGS*DGS*geometry->nrec]();
-    //float * h_rkwVy = new float[DGS*DGS*DGS*geometry->nrec]();
-    //float * h_rkwVz = new float[DGS*DGS*DGS*geometry->nrec]();
 
     for (recId = 0; recId < geometry->nrec; recId++)
     {
@@ -23,28 +20,16 @@ void Triclinic_RSG::set_rec_weights()
         float ry = geometry->yrec[recId];
         float rz = geometry->zrec[recId];
         
-        int rIdx = (int)((rx + 0.5f*dx) / dx);
-        int rIdy = (int)((ry + 0.5f*dy) / dy);
-        int rIdz = (int)((rz + 0.5f*dz) / dz);
+        int rIdx = (int)((rx + 0.5f*dh) / dh);
+        int rIdy = (int)((ry + 0.5f*dh) / dh);
+        int rIdz = (int)((rz + 0.5f*dh) / dh);
     
-        auto rkwPs = kaiser_weights(rx, ry, rz, rIdx, rIdy, rIdz, dx, dy, dz);
-        //auto rkwVx = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz);
-        //auto rkwVy = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz);
-        //auto rkwVz = kaiser_weights(rx + 0.5f*dx, ry + 0.5f*dy, rz + 0.5f*dz, rIdx, rIdy, rIdz, dx, dy, dz);
+        auto rkwPs = kaiser_weights(rx, ry, rz, rIdx, rIdy, rIdz, dh, dh, dh);
         
         for (int zId = 0; zId < DGS; zId++)
-        {
             for (int xId = 0; xId < DGS; xId++)
-            {
                 for (int yId = 0; yId < DGS; yId++)
-                {
                     h_rkwPs[zId + xId*DGS + yId*DGS*DGS + recId*DGS*DGS*DGS] = rkwPs[zId][xId][yId];
-                    //h_rkwVx[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVx[zId][xId][yId];
-                    //h_rkwVy[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVy[zId][xId][yId];
-                    //h_rkwVz[zId + xId*DGS + yId*DGS*DGS + spreadId*DGS*DGS*DGS] = rkwVz[zId][xId][yId];
-                }
-            }
-        }
 
         h_rIdx[recId] = rIdx + nb;
         h_rIdy[recId] = rIdy + nb;
@@ -52,18 +37,12 @@ void Triclinic_RSG::set_rec_weights()
     }
 
     cudaMemcpy(d_rkwPs, h_rkwPs, DGS*DGS*DGS*geometry->nrec*sizeof(float), cudaMemcpyHostToDevice);
-    //cudaMemcpy(d_rkwVx, h_rkwVx, DGS*DGS*DGS*geometry->nrec*sizeof(float), cudaMemcpyHostToDevice);
-    //cudaMemcpy(d_rkwVy, h_rkwVy, DGS*DGS*DGS*geometry->nrec*sizeof(float), cudaMemcpyHostToDevice);
-    //cudaMemcpy(d_rkwVz, h_rkwVz, DGS*DGS*DGS*geometry->nrec*sizeof(float), cudaMemcpyHostToDevice);
 
     cudaMemcpy(d_rIdx, h_rIdx, geometry->nrec*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_rIdy, h_rIdy, geometry->nrec*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_rIdz, h_rIdz, geometry->nrec*sizeof(int), cudaMemcpyHostToDevice);
 
     delete[] h_rkwPs;
-    //delete[] h_rkwVx;
-    //delete[] h_rkwVy;
-    //delete[] h_rkwVz;
     delete[] h_rIdx;
     delete[] h_rIdy;
     delete[] h_rIdz;
@@ -73,7 +52,7 @@ void Triclinic_RSG::set_src_weights()
 {
     float * h_skw = new float[DGS*DGS*DGS]();
 
-    auto skw = gaussian_weights(sx, sy, sz, sIdx, sIdy, sIdz, dx, dy, dz);
+    auto skw = gaussian_weights(sx, sy, sz, sIdx, sIdy, sIdz, dh, dh, dh);
 
     for (int yId = 0; yId < DGS; yId++)
         for (int xId = 0; xId < DGS; xId++)
@@ -90,13 +69,13 @@ void Triclinic_RSG::compute_velocity()
     if (compression)
     {
         uintc_compute_velocity_rsg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,dc_B,
-                                                         maxB,minB,d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx, 
+                                                         maxB,minB,d1D,d2D,d3D,d_wavelet,dh,dh,dh,dt,timeId,tlag,sIdx, 
                                                          sIdy,sIdz,d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
     }
     else 
     {
         float_compute_velocity_rsg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_T,d_B,
-                                                         d1D,d2D,d3D,d_wavelet,dx,dy,dz,dt,timeId,tlag,sIdx,sIdy,sIdz,
+                                                         d1D,d2D,d3D,d_wavelet,dh,dh,dh,dt,timeId,tlag,sIdx,sIdy,sIdz,
                                                          d_skw,nxx,nyy,nzz,nb,nt,eikonalClip);
     }
 }
@@ -108,7 +87,7 @@ void Triclinic_RSG::compute_pressure()
         uintc_compute_pressure_rsg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
                                                          dc_C11,dc_C12,dc_C13,dc_C14,dc_C15,dc_C16,dc_C22,dc_C23,dc_C24,
                                                          dc_C25,dc_C26,dc_C33,dc_C34,dc_C35,dc_C36,dc_C44,dc_C45,dc_C46,
-                                                         dc_C55,dc_C56,dc_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,minC11, 
+                                                         dc_C55,dc_C56,dc_C66,timeId,tlag,dh,dh,dh,dt,nxx,nyy,nzz,minC11, 
                                                          maxC11,minC12,maxC12,minC13,maxC13,minC14,maxC14,minC15,maxC15,
                                                          minC16,maxC16,minC22,maxC22,minC23,maxC23,minC24,maxC24,minC25,
                                                          maxC25,minC26,maxC26,minC33,maxC33,minC34,maxC34,minC35,maxC35, 
@@ -120,7 +99,7 @@ void Triclinic_RSG::compute_pressure()
         float_compute_pressure_rsg<<<nBlocks,NTHREADS>>>(d_Vx,d_Vy,d_Vz,d_Txx,d_Tyy,d_Tzz,d_Txz,d_Tyz,d_Txy,d_P,d_T, 
                                                          d_C11,d_C12,d_C13,d_C14,d_C15,d_C16,d_C22,d_C23,d_C24,d_C25,
                                                          d_C26,d_C33,d_C34,d_C35,d_C36,d_C44,d_C45,d_C46,d_C55,d_C56, 
-                                                         d_C66,timeId,tlag,dx,dy,dz,dt,nxx,nyy,nzz,eikonalClip);
+                                                         d_C66,timeId,tlag,dh,dh,dh,dt,nxx,nyy,nzz,eikonalClip);
     }
 }
 
@@ -140,7 +119,12 @@ __global__ void uintc_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Txy = 0.0f; float d2_Txy = 0.0f; float d3_Txy = 0.0f; float d4_Txy = 0.0f;
     float d1_Txz = 0.0f; float d2_Txz = 0.0f; float d3_Txz = 0.0f; float d4_Txz = 0.0f;
     float d1_Tyz = 0.0f; float d2_Tyz = 0.0f; float d3_Tyz = 0.0f; float d4_Tyz = 0.0f;            
- 
+
+    const float FDM1 = 3.618001e-3f; 
+    const float FDM2 = 2.192849e-2f; 
+    const float FDM3 = 1.063796e-1f; 
+    const float FDM4 = 1.234822f;     
+    
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
     
     T[index] = (eikonal) ? T[index] : 0.0f;
@@ -240,7 +224,12 @@ __global__ void float_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Txy = 0.0f; float d2_Txy = 0.0f; float d3_Txy = 0.0f; float d4_Txy = 0.0f;
     float d1_Txz = 0.0f; float d2_Txz = 0.0f; float d3_Txz = 0.0f; float d4_Txz = 0.0f;
     float d1_Tyz = 0.0f; float d2_Tyz = 0.0f; float d3_Tyz = 0.0f; float d4_Tyz = 0.0f;            
- 
+
+    const float FDM1 = 3.618001e-3f; 
+    const float FDM2 = 2.192849e-2f; 
+    const float FDM3 = 1.063796e-1f; 
+    const float FDM4 = 1.234822f;     
+    
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
     
     T[index] = (eikonal) ? T[index] : 0.0f;
@@ -342,6 +331,11 @@ __global__ void uintc_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Vx = 0.0f; float d2_Vx = 0.0f; float d3_Vx = 0.0f; float d4_Vx = 0.0f;
     float d1_Vy = 0.0f; float d2_Vy = 0.0f; float d3_Vy = 0.0f; float d4_Vy = 0.0f;
     float d1_Vz = 0.0f; float d2_Vz = 0.0f; float d3_Vz = 0.0f; float d4_Vz = 0.0f;
+
+    const float FDM1 = 3.618001e-3f; 
+    const float FDM2 = 2.192849e-2f; 
+    const float FDM3 = 1.063796e-1f; 
+    const float FDM4 = 1.234822f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
 
@@ -453,6 +447,11 @@ __global__ void float_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Vx = 0.0f; float d2_Vx = 0.0f; float d3_Vx = 0.0f; float d4_Vx = 0.0f;
     float d1_Vy = 0.0f; float d2_Vy = 0.0f; float d3_Vy = 0.0f; float d4_Vy = 0.0f;
     float d1_Vz = 0.0f; float d2_Vz = 0.0f; float d3_Vz = 0.0f; float d4_Vz = 0.0f;
+
+    const float FDM1 = 3.618001e-3f; 
+    const float FDM2 = 2.192849e-2f; 
+    const float FDM3 = 1.063796e-1f; 
+    const float FDM4 = 1.234822f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
 

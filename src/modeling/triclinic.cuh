@@ -14,11 +14,6 @@
 
 # define COMPRESS 65535
 
-# define FDM1 6.97545e-4f 
-# define FDM2 9.57031e-3f 
-# define FDM3 7.97526e-2f 
-# define FDM4 1.19628906f 
-
 typedef unsigned short int uintc; 
 
 class Triclinic
@@ -77,7 +72,7 @@ private:
 
 protected:
 
-    float dx, dy, dz, dt;
+    float dh, dt;
     int nxx, nyy, nzz, volsize;
     int nt, nx, ny, nz, nb, nPoints;
     int srcId, recId, sIdx, sIdy, sIdz;

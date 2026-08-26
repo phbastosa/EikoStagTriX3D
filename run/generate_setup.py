@@ -2,51 +2,51 @@ import numpy as np
 
 # Model aspects
 
-nx = 301
-ny = 301
-nz = 51
+nx = 401
+ny = 401
+nz = 161
 
-dx = 10.0
-dy = 10.0
-dz = 10.0
+dx = 12.5
+dy = 12.5
+dz = 12.5
 
-vp = np.array([1500, 1600, 1800, 2000, 2500]) 
-vs = np.array([   0,  950, 1060, 1180, 1470]) 
-ro = np.array([1000, 2350, 2400, 2450, 2500]) 
-z = np.array([  200,   50,  100,  100,   50]) 
+vp = np.array([1500, 1800, 2000]) 
+vs = np.array([   0, 1060, 1180]) 
+ro = np.array([1000, 2400, 2450]) 
+z = np.array([  700, 1000]) 
 
-E1 = np.array([0.0, 0.05, 0.10, 0.12, 0.0])
-E2 = np.array([0.0, 0.07, 0.08, 0.10, 0.0])
-D1 = np.array([0.0, 0.03, 0.05, 0.06, 0.0])
-D2 = np.array([0.0, 0.02, 0.03, 0.05, 0.0])
-D3 = np.array([0.0, 0.01, 0.02, 0.03, 0.0])
-G1 = np.array([0.0, 0.05, 0.02, 0.01, 0.0])
-G2 = np.array([0.0, 0.10, 0.08, 0.06, 0.0])
+E1 = np.array([0.0, 0.0, 0.0])
+E2 = np.array([0.0, 0.0, 0.0])
+D1 = np.array([0.0, 0.0, 0.0])
+D2 = np.array([0.0, 0.0, 0.0])
+D3 = np.array([0.0, 0.0, 0.0])
+G1 = np.array([0.0, 0.0, 0.0])
+G2 = np.array([0.0, 0.0, 0.0])
 
-tilt = np.array([0, 10, 15, 20, 0]) * np.pi/180.0
-azmt = np.array([0,  5, 10, 30, 0]) * np.pi/180.0
+tilt = np.array([0, 0, 0]) * np.pi/180.0
+azmt = np.array([0, 0, 0]) * np.pi/180.0
 
 # Geometry aspects
 
-nsx = 1        
-nsy = 1        
+nsx = 9        
+nsy = 9        
  
-nrx = 117      
-nry = 4        
+nrx = 100      
+nry = 100        
 
 sx_beg = 500   
 sx_end = 500   
 
-sy_beg = 2500  
-sy_end = 2500  
+sy_beg = 4500  
+sy_end = 4500  
 
-rx_beg = 50    
-rx_end = 2950  
+rx_beg = 25    
+rx_end = 4975  
 
-ry_beg = 50    
-ry_end = 2950  
+ry_beg = 25    
+ry_end = 4975  
 
-sz = 0          
+sz = 100          
 rz = 0         
 
 # End of user area

@@ -1,17 +1,11 @@
 # include <sys/resource.h>
 
-# include "modeling/triclinic_ssg.cuh"
 # include "modeling/triclinic_rsg.cuh"
 # include "modeling/triclinic_issg.cuh"
 
 int main(int argc, char **argv)
 {
-    std::vector<Triclinic *> modeling = 
-    {
-        new Triclinic_SSG(),
-        new Triclinic_RSG(),
-        new Triclinic_iSSG()
-    };
+    std::vector<Triclinic *> modeling = {new Triclinic_RSG(), new Triclinic_iSSG()};
 
     auto file = std::string(argv[1]);
     auto type = std::stoi(catch_parameter("modeling_type", file));    
