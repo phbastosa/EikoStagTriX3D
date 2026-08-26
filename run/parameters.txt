@@ -27,7 +27,7 @@ RPS = ../inputs/geometry/EikoStagTriX3D_RPS.txt
 # [1] - Triclinic iSSG
 # --------------------------------------------------------------------------------------------------
 
-modeling_type = 0
+modeling_type = 1
 
 eikonalClip = true
 compression = true

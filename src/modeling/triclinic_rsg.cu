@@ -120,10 +120,10 @@ __global__ void uintc_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Txz = 0.0f; float d2_Txz = 0.0f; float d3_Txz = 0.0f; float d4_Txz = 0.0f;
     float d1_Tyz = 0.0f; float d2_Tyz = 0.0f; float d3_Tyz = 0.0f; float d4_Tyz = 0.0f;            
 
-    const float FDM1 = 3.618001e-3f; 
-    const float FDM2 = 2.192849e-2f; 
-    const float FDM3 = 1.063796e-1f; 
-    const float FDM4 = 1.234822f;     
+    const float FDM1 = 6.97545e-4f; 
+    const float FDM2 = 9.57031e-3f; 
+    const float FDM3 = 7.97526e-2f; 
+    const float FDM4 = 1.19628906f;     
     
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
     
@@ -225,10 +225,10 @@ __global__ void float_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Txz = 0.0f; float d2_Txz = 0.0f; float d3_Txz = 0.0f; float d4_Txz = 0.0f;
     float d1_Tyz = 0.0f; float d2_Tyz = 0.0f; float d3_Tyz = 0.0f; float d4_Tyz = 0.0f;            
 
-    const float FDM1 = 3.618001e-3f; 
-    const float FDM2 = 2.192849e-2f; 
-    const float FDM3 = 1.063796e-1f; 
-    const float FDM4 = 1.234822f;     
+    const float FDM1 = 6.97545e-4f; 
+    const float FDM2 = 9.57031e-3f; 
+    const float FDM3 = 7.97526e-2f; 
+    const float FDM4 = 1.19628906f;     
     
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
     
@@ -332,10 +332,10 @@ __global__ void uintc_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Vy = 0.0f; float d2_Vy = 0.0f; float d3_Vy = 0.0f; float d4_Vy = 0.0f;
     float d1_Vz = 0.0f; float d2_Vz = 0.0f; float d3_Vz = 0.0f; float d4_Vz = 0.0f;
 
-    const float FDM1 = 3.618001e-3f; 
-    const float FDM2 = 2.192849e-2f; 
-    const float FDM3 = 1.063796e-1f; 
-    const float FDM4 = 1.234822f;     
+    const float FDM1 = 6.97545e-4f; 
+    const float FDM2 = 9.57031e-3f; 
+    const float FDM3 = 7.97526e-2f; 
+    const float FDM4 = 1.19628906f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
 
@@ -448,10 +448,10 @@ __global__ void float_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     float d1_Vy = 0.0f; float d2_Vy = 0.0f; float d3_Vy = 0.0f; float d4_Vy = 0.0f;
     float d1_Vz = 0.0f; float d2_Vz = 0.0f; float d3_Vz = 0.0f; float d4_Vz = 0.0f;
 
-    const float FDM1 = 3.618001e-3f; 
-    const float FDM2 = 2.192849e-2f; 
-    const float FDM3 = 1.063796e-1f; 
-    const float FDM4 = 1.234822f;     
+    const float FDM1 = 6.97545e-4f; 
+    const float FDM2 = 9.57031e-3f; 
+    const float FDM3 = 7.97526e-2f; 
+    const float FDM4 = 1.19628906f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
 
