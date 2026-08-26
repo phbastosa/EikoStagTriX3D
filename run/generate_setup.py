@@ -35,9 +35,9 @@ nrx = 100
 nry = 100        
 
 sx_beg = 1000   
-sx_end = 1000   
+sx_end = 4000   
 
-sy_beg = 4000  
+sy_beg = 1000  
 sy_end = 4000  
 
 rx_beg = 25    
