@@ -129,10 +129,10 @@ __global__ void uintc_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if((i >= 3) && (i < nzz-4) && (j >= 3) && (j < nxx-4) && (k >= 3) && (k < nyy-4)) 
-        {   
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        {
             # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
             {
@@ -234,10 +234,10 @@ __global__ void float_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if((i >= 3) && (i < nzz-4) && (j >= 3) && (j < nxx-4) && (k >= 3) && (k < nyy-4)) 
-        {   
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        {
             # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
             {
@@ -341,9 +341,9 @@ __global__ void uintc_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
 
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if((i > 3) && (i < nzz-3) && (j > 3) && (j < nxx-3) && (k > 3) && (k < nyy-3)) 
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
         {
             # pragma unroll 4
             for (int rsg = 0; rsg < 4; rsg++)
@@ -457,9 +457,9 @@ __global__ void float_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
 
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if ((T[index] < (float)(tId + tlag)*dt) && (index < nxx*nyy*nzz))
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if((i > 3) && (i < nzz-3) && (j > 3) && (j < nxx-3) && (k > 3) && (k < nyy-3)) 
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
         {
             # pragma unroll 4
             for (int rsg = 0; rsg < 4; rsg++)

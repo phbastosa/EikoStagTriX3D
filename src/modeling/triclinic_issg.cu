@@ -137,9 +137,9 @@ __global__ void uintc_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
 
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if ((T[index] < (float)(tId + tlag)*dt))
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
         {
             float b  = (minB + (static_cast<float>(B[bsi + bsj + bsk]) - 1.0f) * (maxB - minB) / (COMPRESS - 1));
             float bi = (minB + (static_cast<float>(B[ip1 + bsj + bsk]) - 1.0f) * (maxB - minB) / (COMPRESS - 1));
@@ -198,20 +198,20 @@ __global__ void uintc_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
             Vx[index] += dt*Bx*(dTxx_dx + dTxy_dy + dTxz_dz); 
             Vy[index] += dt*By*(dTxy_dx + dTyy_dy + dTyz_dz); 
             Vz[index] += dt*Bz*(dTxz_dx + dTyz_dy + dTzz_dz); 
+
+            float damper = get_boundary_damper(damp1D, damp2D, damp3D, i, j, k, nxx, nyy, nzz, nb);
+
+            Vx[index] *= damper;
+            Vy[index] *= damper;
+            Vz[index] *= damper;
+
+            Txx[index] *= damper;
+            Tyy[index] *= damper;
+            Tzz[index] *= damper;
+            Txz[index] *= damper;
+            Tyz[index] *= damper;
+            Txy[index] *= damper;
         }
-
-        float damper = get_boundary_damper(damp1D, damp2D, damp3D, i, j, k, nxx, nyy, nzz, nb);
-
-        Vx[index] *= damper;
-        Vy[index] *= damper;
-        Vz[index] *= damper;
-
-        Txx[index] *= damper;
-        Tyy[index] *= damper;
-        Tzz[index] *= damper;
-        Txz[index] *= damper;
-        Tyz[index] *= damper;
-        Txy[index] *= damper;
     }
 }
 
@@ -249,9 +249,9 @@ __global__ void float_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
 
     T[index] = (eikonal) ? T[index] : 0.0f;
 
-    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+    if ((T[index] < (float)(tId + tlag)*dt))
     {
-        if ((T[index] < (float)(tId + tlag)*dt))
+        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
         {
             float b  = B[bsi + bsj + bsk];
             float bi = B[ip1 + bsj + bsk];
@@ -310,20 +310,20 @@ __global__ void float_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
             Vx[index] += dt*Bx*(dTxx_dx + dTxy_dy + dTxz_dz); 
             Vy[index] += dt*By*(dTxy_dx + dTyy_dy + dTyz_dz); 
             Vz[index] += dt*Bz*(dTxz_dx + dTyz_dy + dTzz_dz);
+        
+            float damper = get_boundary_damper(damp1D, damp2D, damp3D, i, j, k, nxx, nyy, nzz, nb);
+
+            Vx[index] *= damper;
+            Vy[index] *= damper;
+            Vz[index] *= damper;
+
+            Txx[index] *= damper;
+            Tyy[index] *= damper;
+            Tzz[index] *= damper;
+            Txz[index] *= damper;
+            Tyz[index] *= damper;
+            Txy[index] *= damper;        
         }
-
-        float damper = get_boundary_damper(damp1D, damp2D, damp3D, i, j, k, nxx, nyy, nzz, nb);
-
-        Vx[index] *= damper;
-        Vy[index] *= damper;
-        Vz[index] *= damper;
-
-        Txx[index] *= damper;
-        Tyy[index] *= damper;
-        Tzz[index] *= damper;
-        Txz[index] *= damper;
-        Tyz[index] *= damper;
-        Txy[index] *= damper;
     }
 }
 
