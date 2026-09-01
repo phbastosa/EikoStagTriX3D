@@ -1005,10 +1005,10 @@ __global__ void float_compute_pressure_issg(float * Vx, float * Vy, float * Vz, 
     float dVz_dy, dVz_dy1, dVz_dy2, dVz_dy3, dVz_dy4;
     float dVz_dz, dVz_dz1, dVz_dz2, dVz_dz3, dVz_dz4;
 
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
     if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
         if ((T[index] < (float)(tId + tlag)*dt))
         {
             float c11 = C11[index];

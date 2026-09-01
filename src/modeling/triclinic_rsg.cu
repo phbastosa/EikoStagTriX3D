@@ -127,11 +127,11 @@ __global__ void uintc_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
     
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
             # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
@@ -231,12 +231,12 @@ __global__ void float_compute_velocity_rsg(float * Vx, float * Vy, float * Vz, f
     const float FDM4 = 1.19628906f;     
     
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
-    
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+        
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
             # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
@@ -338,16 +338,16 @@ __global__ void uintc_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     const float FDM4 = 1.19628906f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
-
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+    
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
-            # pragma unroll 4
+            # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
-            {       
+            {
                 d1_Vx += FDM[rsg]*(Vx[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vx[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
                 d1_Vy += FDM[rsg]*(Vy[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vy[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
                 d1_Vz += FDM[rsg]*(Vz[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vz[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
@@ -454,16 +454,16 @@ __global__ void float_compute_pressure_rsg(float * Vx, float * Vy, float * Vz, f
     const float FDM4 = 1.19628906f;     
 
     float FDM[] = {FDM4, -FDM3, FDM2, -FDM1};
-
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+    
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
-            # pragma unroll 4
+            # pragma unroll 4 
             for (int rsg = 0; rsg < 4; rsg++)
-            {       
+            {
                 d1_Vx += FDM[rsg]*(Vx[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vx[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
                 d1_Vy += FDM[rsg]*(Vy[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vy[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
                 d1_Vz += FDM[rsg]*(Vz[(i+rsg) + (j+rsg)*nzz + (k+rsg)*nxx*nzz] - Vz[(i-rsg-1) + (j-rsg-1)*nzz + (k-rsg-1)*nxx*nzz]);      
