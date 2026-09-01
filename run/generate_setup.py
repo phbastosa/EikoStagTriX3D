@@ -67,8 +67,8 @@ SPS[:,0] = np.reshape(sx, [ns], order = "F")
 SPS[:,1] = np.reshape(sy, [ns], order = "F")
 SPS[:,2] = np.zeros(ns) + sz
 
-RPS[:,0] = np.reshape(rx, [nr], order = "C")
-RPS[:,1] = np.reshape(ry, [nr], order = "C")
+RPS[:,0] = np.reshape(rx, [nr], order = "F")
+RPS[:,1] = np.reshape(ry, [nr], order = "F")
 RPS[:,2] = np.zeros(nr) + rz
 
 path_SPS = "../inputs/geometry/EikoStagTriX3D_SPS.txt"
