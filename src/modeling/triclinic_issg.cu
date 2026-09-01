@@ -135,11 +135,11 @@ __global__ void uintc_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
     size_t kp1 = (k+1)*nxx_nzz, kp2 = (k+2)*nxx_nzz, kp3 = (k+3)*nxx_nzz, kp4 = (k+4)*nxx_nzz;
     size_t km1 = (k-1)*nxx_nzz, km2 = (k-2)*nxx_nzz, km3 = (k-3)*nxx_nzz, km4 = (k-4)*nxx_nzz;
 
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
             float b  = (minB + (static_cast<float>(B[bsi + bsj + bsk]) - 1.0f) * (maxB - minB) / (COMPRESS - 1));
             float bi = (minB + (static_cast<float>(B[ip1 + bsj + bsk]) - 1.0f) * (maxB - minB) / (COMPRESS - 1));
@@ -247,11 +247,11 @@ __global__ void float_compute_velocity_issg(float * Vx, float * Vy, float * Vz, 
     size_t kp1 = (k+1)*nxx_nzz, kp2 = (k+2)*nxx_nzz, kp3 = (k+3)*nxx_nzz, kp4 = (k+4)*nxx_nzz;
     size_t km1 = (k-1)*nxx_nzz, km2 = (k-2)*nxx_nzz, km3 = (k-3)*nxx_nzz, km4 = (k-4)*nxx_nzz;
 
-    T[index] = (eikonal) ? T[index] : 0.0f;
-
-    if ((T[index] < (float)(tId + tlag)*dt))
+    if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
     {
-        if((i >= 4) && (i < nzz-4) && (j >= 4) && (j < nxx-4) && (k >= 4) && (k < nyy-4)) 
+        T[index] = (eikonal) ? T[index] : 0.0f;
+
+        if ((T[index] < (float)(tId + tlag)*dt))
         {
             float b  = B[bsi + bsj + bsk];
             float bi = B[ip1 + bsj + bsk];
